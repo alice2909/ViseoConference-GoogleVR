@@ -19,7 +19,7 @@ var dataChannelReceive = document.querySelector('textarea#dataChannelReceive');
 var startButton = document.querySelector('button#startButton');
 var sendButton = document.querySelector('button#sendButton');
 var closeButton = document.querySelector('button#closeButton');
-
+// create the buttons that will enable the user to choose which  action he wants to process.
 startButton.onclick = createConnection;
 sendButton.onclick = sendData;
 closeButton.onclick = closeDataChannels;
@@ -31,13 +31,14 @@ function enableStartButton() {
 function disableSendButton() {
   sendButton.disabled = true;
 }
-
+//will connect the oculus to the server.
 function createConnection() {
   dataChannelSend.placeholder = '';
   var servers = null;
   pcConstraint = null;
   dataConstraint = null;
   trace('Using SCTP based data channels');
+  //SCTP is like TCP but stream oriented while TCP is byte oriented but guarantees the same properties as TCP. 
   // SCTP is supported from Chrome 31 and is supported in FF.
   // No need to pass DTLS constraint as it is on by default in Chrome 31.
   // For SCTP, reliable and ordered is true by default.
