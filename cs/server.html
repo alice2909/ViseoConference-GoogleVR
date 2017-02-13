@@ -52,23 +52,20 @@
             pc = new webkitRTCPeerConnection(iceServer);
 
             pc.onaddstream = function(event){
-            // webkit is an opensource 
+            // webkit is an opensource library for web display.
                var remoteMedia1 = new webkitMediaStream();
                var remoteMedia2 = new webkitMediaStream();
-              // var remoteMedia3 = new webkitMediaStream();
+
                event.stream.getVideoTracks()[0].enabled = true;
                event.stream.getVideoTracks()[1].enabled = true;
-              // event.stream.getAudioTracks()[0].enabled = true;
 
 
                remoteMedia1.addTrack(event.stream.getVideoTracks()[0]);
                remoteMedia2.addTrack(event.stream.getVideoTracks()[1]);
-              // remoteMedia3.addTrack(event.stream.getAudioTracks()[0]);
-               document.getElementById('remoteVideo').src = URL.createObjectURL(remoteMedia1);
-               document.getElementById('remoteVideo1').src = URL.createObjectURL(remoteMedia2);
-              // document.getElementById('remoteAudio').src = URL.createObjectURL(remoteMedia3);
-                // var sound = new Audio(event.stream.getAudioTracks()[0]);
-                // sound.play();
+
+              document.getElementById('remoteVideo').src = URL.createObjectURL(remoteMedia1);
+              document.getElementById('remoteVideo1').src = URL.createObjectURL(remoteMedia2);
+          
 
             };
           // send a message that prooves that the connection is established
@@ -78,7 +75,8 @@
                 webSocket.send(message);
                 }, 1000);
               };
-
+          
+          // we wait for the connection if this one is made a callback is also made otherwise the timeout will ring.
            function waitForConnection(callback, interval) {
                 if (webSocket.readyState === 1) {
                   callback();
