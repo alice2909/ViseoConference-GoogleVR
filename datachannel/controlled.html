@@ -79,7 +79,7 @@
              pc = new webkitRTCPeerConnection(iceServer);
              sendChannel = pc.createDataChannel('sendDataChannel');
              console.trace('create send data channel');
-            // 发送ICE候选到其他客户端
+            // Send ICE candidates to other clients
       
              pc.createOffer(sendOfferFn, function (error) {
                        console.log('Failure callback: ' + error);
