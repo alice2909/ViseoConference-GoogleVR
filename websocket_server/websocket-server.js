@@ -44,6 +44,7 @@ wsServer.on('request', function(request) {
 
     connection.on('close', function(connection) {
         // close user connection
+        clients = clients.filter(item => item !== connection);
         console.log((new Date()) + " Peer disconnected.");
     });
 });
