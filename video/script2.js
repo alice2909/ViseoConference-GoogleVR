@@ -9,7 +9,8 @@ function onOpen(event) {
   }
 
   var newstream = new webkitMediaStream();
-
+      //var flag = true;
+      // var webSocket =new WebSocket("ws://130.190.52.87:5566");
   var iceServer = {
             "iceServers": [{
                 "url": "stun:stun.l.google.com:19302"
@@ -19,7 +20,7 @@ function onOpen(event) {
 
   function start() {
 
-      var webSocket =new WebSocket("ws://192.168.1.10:5568");
+      var webSocket =new WebSocket("ws://192.168.1.81:5567");
         webSocket.onopen = function(event) {
         onOpen(event);
       };
@@ -187,13 +188,6 @@ function onOpen(event) {
       function successCallback4(stream) {
 
         newstream.addTrack(stream.getVideoTracks()[0]);
-        pc.addStream(newstream);
-        //如果是发起方则发送一个offer信令
-
-
-        pc.createOffer(sendOfferFn, function (error) {
-               console.log('Failure callback: ' + error);
-            });
 //        alert("video2");
         //var k = newstream.getTracks().length;
         //alert(newstream.getTracks().length);
@@ -201,43 +195,43 @@ function onOpen(event) {
 
       }
 
-      // function remoteaudio() {
-      //   var audioSource = audioSelect.value;
-      //   var constraints = {
-      //     audio: {
-      //     //   mandatory:
-      //     //   {
-      //     //     echoCancellation:false,
-      //     //     googEchoCancellation:false,
-      //     //     stereo:true,
-      //     // //    arc:opus/48000,
-      //     //   },
-      //       optional: [{
-      //         sourceId: audioSource
-      //       }]
-      //     }
-      //   };
-      //   navigator.getUserMedia(constraints, successCallback5, errorCallback);
-      // }
-      //
-      // function successCallback5(stream) {
-      //   newstream.addTrack(stream.getAudioTracks()[0]);
-      //   pc.addStream(newstream);
-      //   //如果是发起方则发送一个offer信令
-      //
-      //
-      //   pc.createOffer(sendOfferFn, function (error) {
-      //          console.log('Failure callback: ' + error);
-      //       });
-      //   //pc.addStream(newstream);
-      //
-      //
-      // }
+      function remoteaudio() {
+        var audioSource = audioSelect.value;
+        var constraints = {
+          audio: {
+          //   mandatory:
+          //   {
+          //     echoCancellation:false,
+          //     googEchoCancellation:false,
+          //     stereo:true,
+          // //    arc:opus/48000,
+          //   },
+            optional: [{
+              sourceId: audioSource
+            }]
+          }
+        };
+        navigator.getUserMedia(constraints, successCallback5, errorCallback);
+      }
+
+      function successCallback5(stream) {
+        newstream.addTrack(stream.getAudioTracks()[0]);
+        pc.addStream(newstream);
+        //如果是发起方则发送一个offer信令
+
+
+        pc.createOffer(sendOfferFn, function (error) {
+               console.log('Failure callback: ' + error);
+            });
+        //pc.addStream(newstream);
+
+
+      }
 
 
       remotevideo();
       remotevideo1();
-      // remoteaudio();
+      remoteaudio();
 
 
       //处理到来的信令

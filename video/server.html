@@ -28,7 +28,7 @@
         var pc;
         var sendChannel;
         function start() {
-            var webSocket =new WebSocket("ws://192.168.43.253:5568");
+            var webSocket =new WebSocket("ws://192.168.1.81:5567");
 
             webSocket.onopen = function(event) {
               onOpen(event);
@@ -48,8 +48,18 @@
                         "url": "stun:stun.l.google.com:19302"
                     }]
                 };
+            // åˆ›å»ºPeerConnectionå®žä¾‹ (å�‚æ•°ä¸ºnullåˆ™æ²¡æœ‰iceserverï¼Œå�³ä½¿æ²¡æœ‰stunserverå’Œturnserverï¼Œä»�å�¯åœ¨å±€åŸŸç½‘ä¸‹é€šè®¯)
             pc = new webkitRTCPeerConnection(iceServer);
+            //sendChannel = pc.createDataChannel('sendDataChannel');
+            //console.trace('create send data channel');
+           // 发送ICE候选到其他客户端
+           //sendChannel.onopen = onSendChannelStateChange;
+           //sendChannel.onclose = onSendChannelStateChange;
 
+            // å�‘é€�ICEå€™é€‰åˆ°å…¶ä»–å®¢æˆ·ç«¯
+
+
+            // å¦‚æžœæ£€æµ‹åˆ°åª’ä½“æµ�è¿žæŽ¥åˆ°æœ¬åœ°ï¼Œå°†å…¶ç»‘å®šåˆ°ä¸€ä¸ªvideoæ ‡ç­¾ä¸Šè¾“å‡º
 
             pc.onaddstream = function(event){
                 //alert("æ£€æµ‹åˆ°æµ�");
@@ -238,7 +248,7 @@
 
   <body>
     <input type="submit" value="Adminlogin" onclick="start()">
-    <!-- <input type="submit" value="send" onclick="sendData()"> -->
+    <input type="submit" value="send" onclick="sendData()">
     <div id="messages">
     </div>
     <video id="remoteVideo" autoplay="autoplay"></video>

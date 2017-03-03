@@ -9,8 +9,6 @@
     <!--
     <link rel="stylesheet" type="text/css" href="styles.css">
     -->
-    <!-- CSS -->
-    <link rel="stylesheet" type="text/css" href="style1.css" />
     <script type="text/javascript">
 
 
@@ -23,12 +21,8 @@
              document.getElementById('messages').innerHTML
                 += '<br/>'+event.data;
         }
-
-
-        var pc;
-        var sendChannel;
         function start() {
-            var webSocket =new WebSocket("ws://192.168.43.253:5568");
+            var webSocket =new WebSocket("ws://192.168.1.10:5567");
 
             webSocket.onopen = function(event) {
               onOpen(event);
@@ -48,90 +42,33 @@
                         "url": "stun:stun.l.google.com:19302"
                     }]
                 };
-            pc = new webkitRTCPeerConnection(iceServer);
+            // 创建PeerConnection实例 (参数为null则没有iceserver，即使没有stunserver和turnserver，仍可在局域网下通讯)
+            var pc = new webkitRTCPeerConnection(iceServer);
+
+            // 发送ICE候选到其他客户端
 
 
+            // 如果检测到媒体流连接到本地，将其绑定到一个video标签上输出
             pc.onaddstream = function(event){
-                //alert("æ£€æµ‹åˆ°æµ�");
-                //alert(event.stream.getTracks().length);
-               var remoteMedia1 = new webkitMediaStream();
-               var remoteMedia2 = new webkitMediaStream();
-              // var remoteMedia3 = new webkitMediaStream();
-               event.stream.getVideoTracks()[0].enabled = true;
-               event.stream.getVideoTracks()[1].enabled = true;
-              // event.stream.getAudioTracks()[0].enabled = true;
-
-
-               remoteMedia1.addTrack(event.stream.getVideoTracks()[0]);
-               remoteMedia2.addTrack(event.stream.getVideoTracks()[1]);
-              // remoteMedia3.addTrack(event.stream.getAudioTracks()[0]);
-               document.getElementById('remoteVideo').src = URL.createObjectURL(remoteMedia1);
-               document.getElementById('remoteVideo1').src = URL.createObjectURL(remoteMedia2);
-              // document.getElementById('remoteAudio').src = URL.createObjectURL(remoteMedia3);
-                // var sound = new Audio(event.stream.getAudioTracks()[0]);
-                // sound.play();
-
+                //alert("检测到流");
+                document.getElementById('remoteVideo').src = webkitURL.createObjectURL(event.stream);
             };
 
-
-            // remoteMedia.onaddtrack = function (evt) {
-            //         console.log("New remote track added");
-            //         // omitted: check to see if video track exists first before doing this
-            //         remoteMedia.getVideoTracks()[0].enabled = true;
-            //     };
-            //
-            // pc.onaddstream = function (evt) {
-            //     console.log("New stream added");
-            //     var remoteMediaStream = evt.stream;
-            //     if (remoteMedia == null) {
-            //         remoteMedia     = remoteMediaStream;
-            //         remoteVideo     = document.getElementById('remoteVideo');//avCaptureUtil.createVideoElement(toUri);
-            //         remoteVideo.src = window.URL.createObjectURL(remoteMedia);
-            //     }
-            //     else {
-            //         remoteMedia.addTrack(remoteMediaStream.getVideoTracks()[0]); //add the video track to the existing stream
-            //     }
-            //   }
-
-
-
-
-
-
-            function send(message) {
-                waitForConnection(function () {
-                webSocket.send(message);
-                }, 1000);
-              };
-
-           function waitForConnection(callback, interval) {
-                if (webSocket.readyState === 1) {
-                  callback();
-                } else {
-                //var that = this;
-                // optional: implement backoff for interval here
-                setTimeout(function () {
-                    waitForConnection(callback, interval);
-                }, interval);
-              }
-            };
-            // å�‘é€�offerå’Œanswerçš„å‡½æ•°ï¼Œå�‘é€�æœ¬åœ°sessionæ��è¿°
-            var sendOfferFn = function(desc){
+            // 发送offer和answer的函数，发送本地session描述
+            /*var sendOfferFn = function(desc){
 
                 alert(desc.sdp)
                 //pc.setRemoteDescription(desc);
                // pc.setLocalDescription(desc);
 
-                send(JSON.stringify({
+                webSocket.send(JSON.stringify({
                     "event": "_offer",
                     "data": {
                         "sdp": desc
                     }
                 }));
-            };
-            // pc.createOffer(sendOfferFn, function (error) {
-            //           console.log('Failure callback: ' + error);
-            //         });
+            };*/
+
             pc.onicecandidate = function(event){
                 if (event.candidate !== null) {
                     webSocket.send(JSON.stringify({
@@ -144,8 +81,36 @@
             };
 
 
+
+            function setSDPStereo(sdp) {
+                var sdpLines = sdp.split('\r\n');
+                var fmtpLineIndex = null;
+                for (var i = 0; i < sdpLines.length; i++) {
+                    if (sdpLines[i].search('opus/48000') !== -1) {
+                        var opusPayload = extractSdp(sdpLines[i], /:(\d+) opus\/48000/i);
+                        break;
+                    }
+                }
+                for (var i = 0; i < sdpLines.length; i++) {
+                    if (sdpLines[i].search('a=fmtp') !== -1) {
+                        var payload = extractSdp(sdpLines[i], /a=fmtp:(\d+)/ );
+                        if (payload === opusPayload) {
+                            fmtpLineIndex = i;
+                            break;
+                        }
+                    }
+                }
+                if (fmtpLineIndex === null) return sdp;
+               sdpLines[fmtpLineIndex] = sdpLines[fmtpLineIndex].concat('; stereo=1; sprop-stereo=1');
+                sdp = sdpLines.join('\r\n');
+                return sdp;
+            }
+            function extractSdp(sdpLine, pattern) {
+              var result = sdpLine.match(pattern);
+              return result && result.length === 2 ? result[1] : null;
+            }
             var sendAnswerFn = function(desc){
-                //desc.sdp = setSDPStereo(desc.sdp);
+                desc.sdp = setSDPStereo(desc.sdp);
                 pc.setLocalDescription(desc);
                 webSocket.send(JSON.stringify({
                     "event": "_answer",
@@ -155,27 +120,27 @@
                 }));
             };
 
-            // èŽ·å�–æœ¬åœ°éŸ³é¢‘å’Œè§†é¢‘æµ�
+            // 获取本地音频和视频流
            /* navigator.webkitGetUserMedia({
                 "audio": true,
                 "video": true
             }, function(stream){
-                //ç»‘å®šæœ¬åœ°åª’ä½“æµ�åˆ°videoæ ‡ç­¾ç”¨äºŽè¾“å‡º
+                //绑定本地媒体流到video标签用于输出
                // document.getElementById('localVideo').src = URL.createObjectURL(stream);
-                //å�‘PeerConnectionä¸­åŠ å…¥éœ€è¦�å�‘é€�çš„æµ�
+                //向PeerConnection中加入需要发送的流
                 pc.addStream(stream);
-                //å¦‚æžœæ˜¯å�‘èµ·æ–¹åˆ™å�‘é€�ä¸€ä¸ªofferä¿¡ä»¤
+                //如果是发起方则发送一个offer信令
 
                 pc.createOffer(sendOfferFn, function (error) {
                    console.log('Failure callback: ' + error);
                 });
 
             }, function(error){
-                //å¤„ç�†åª’ä½“æµ�åˆ›å»ºå¤±è´¥é”™è¯¯
+                //处理媒体流创建失败错误
                 console.log('getUserMedia error: ' + error);
             });
             */
-            //å¤„ç�†åˆ°æ�¥çš„ä¿¡ä»¤
+            //处理到来的信令
             webSocket.onmessage = function(event){
                 //alert(event.data)
                 //document.getElementById('messages').innerHTML
@@ -183,17 +148,17 @@
                 var jsonstr="'"+event.data+"'"
                 var json = JSON.parse(event.data);
                 console.log('onmessage: ', json);
-                //å¦‚æžœæ˜¯ä¸€ä¸ªICEçš„å€™é€‰ï¼Œåˆ™å°†å…¶åŠ å…¥åˆ°PeerConnectionä¸­ï¼Œå�¦åˆ™è®¾å®šå¯¹æ–¹çš„sessionæ��è¿°ä¸ºä¼ é€’è¿‡æ�¥çš„æ��è¿°
+                //如果是一个ICE的候选，则将其加入到PeerConnection中，否则设定对方的session描述为传递过来的描述
 
                 if( json.event == "_ice_candidate" ){
-                    //alert("æ”¶åˆ°å€™é€‰");
+                    //alert("收到候选");
                     pc.addIceCandidate(new RTCIceCandidate(json.data.candidate));
 
                 } else {
 
                    if(json.event == "_offer") {
                        pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp),function(){
-                       //pc.setRemoteDescription(null,function()
+                       //pc.setRemoteDescription(null,function(){
                            pc.createAnswer(sendAnswerFn, function (error) {
                                 alert(error);
                                 console.log('Failure callback: ' + error);
@@ -219,7 +184,7 @@
                    //pc.setRemoteDescription(new RTCSessionDescription(pc.SDP_OFFER,json.data.sdp));
                    //pc.SDP_OFFER
                     //pc.setRemoteDescription(pc.SDP_OFFER,new SessionDescription(json.data.sdp.sdp));
-                    // å¦‚æžœæ˜¯ä¸€ä¸ªofferï¼Œé‚£ä¹ˆéœ€è¦�å›žå¤�ä¸€ä¸ªanswer
+                    // 如果是一个offer，那么需要回复一个answer
                    /* if(json.event == "_offer") {
                         alert(json.event)
                         pc.createAnswer(sendAnswerFn, function (error) {
@@ -232,19 +197,15 @@
             };
         }
 
-
     </script>
   </head>
 
   <body>
     <input type="submit" value="Adminlogin" onclick="start()">
-    <!-- <input type="submit" value="send" onclick="sendData()"> -->
     <div id="messages">
     </div>
-    <video id="remoteVideo" autoplay="autoplay"></video>
-    <video id="remoteVideo1" autoplay="autoplay"></video>
-    <!-- <video id="localVideo" autoplay></video> -->
-    <!-- <audio id="remoteAudio" autoplay="autoplay" controls></audio> -->
+    <audio id="remoteVideo" autoplay="autoplay"></audio>
+    <video id="localVideo" autoplay></video>
 
   </body>
 </html>

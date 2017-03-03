@@ -11,16 +11,9 @@
 </head>
 
 <body>
-  <body>
-    <input type="submit" value="clientLogin" onclick="start()">
 
-    <div id="messages">
-    </div>
-  
-  </body>
 <div id="container">
-
-  <div class="select">
+  <div class="select" id="audio">
     <label for="audioSource">Audio source: </label>
     <select id="audioSource"></select>
   </div>
@@ -31,19 +24,14 @@
     <label for="videoSource2">Camera 2: </label>
     <select id="videoSource2"></select>
   </div>
+
+  <video id="video1" muted autoplay></video>
+  <video id="video2" muted autoplay></video>
+
+  <script src="script.js"></script>
+
 </div>
 
 
 </body>
-
-  <video id="video1"  autoplay></video>
-  <video id="video2" muted autoplay></video>
-    <audio id="audio1" muted autoplay controls ></audio>
-
-
-  <script src="script.js"></script>
-  <script src="script2.js"></script>
-
-
-
 </html>
