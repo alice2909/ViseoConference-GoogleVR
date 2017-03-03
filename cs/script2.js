@@ -33,15 +33,7 @@ function onOpen(event) {
           alert(event.data)
       }
 
-      //   var iceServer = {
-      //         "iceServers": [{
-      //             "url": "stun:stun.l.google.com:19302"
-      //         }]
-      //     };
-      //
-      //
-      // // 创建PeerConnection实例 (参数为null则没有iceserver，即使没有stunserver和turnserver，仍可在局域网下通讯)
-      //
+
        var pc = new webkitRTCPeerConnection(iceServer);
 
 
@@ -63,36 +55,6 @@ function onOpen(event) {
         }
       };
 
-
-
-      // function setSDPStereo(sdp) {
-      //     var sdpLines = sdp.split('\r\n');
-      //     var fmtpLineIndex = null;
-      //     for (var i = 0; i < sdpLines.length; i++) {
-      //         if (sdpLines[i].search('opus/48000') !== -1) {
-      //             var opusPayload = extractSdp(sdpLines[i], /:(\d+) opus\/48000/i);
-      //             break;
-      //         }
-      //     }
-      //     for (var i = 0; i < sdpLines.length; i++) {
-      //         if (sdpLines[i].search('a=fmtp') !== -1) {
-      //             var payload = extractSdp(sdpLines[i], /a=fmtp:(\d+)/ );
-      //             if (payload === opusPayload) {
-      //                 fmtpLineIndex = i;
-      //                 break;
-      //             }
-      //         }
-      //     }
-      //     if (fmtpLineIndex === null) return sdp;
-      //    sdpLines[fmtpLineIndex] = sdpLines[fmtpLineIndex].concat('; stereo=1; sprop-stereo=1');
-      //     sdp = sdpLines.join('\r\n');
-      //     return sdp;
-      // }
-      // function extractSdp(sdpLine, pattern) {
-      //   var result = sdpLine.match(pattern);
-      //   return result && result.length === 2 ? result[1] : null;
-      // }
-      // 发送offer和answer的函数，发送本地session描述
       var sendOfferFn = function(desc){
   //        desc.sdp = setSDPStereo(desc.sdp);
           pc.setLocalDescription(desc);
@@ -188,7 +150,7 @@ function onOpen(event) {
 
         newstream.addTrack(stream.getVideoTracks()[0]);
         pc.addStream(newstream);
-        //如果是发起方则发送一个offer信令
+
 
 
         pc.createOffer(sendOfferFn, function (error) {
@@ -201,38 +163,7 @@ function onOpen(event) {
 
       }
 
-      // function remoteaudio() {
-      //   var audioSource = audioSelect.value;
-      //   var constraints = {
-      //     audio: {
-      //     //   mandatory:
-      //     //   {
-      //     //     echoCancellation:false,
-      //     //     googEchoCancellation:false,
-      //     //     stereo:true,
-      //     // //    arc:opus/48000,
-      //     //   },
-      //       optional: [{
-      //         sourceId: audioSource
-      //       }]
-      //     }
-      //   };
-      //   navigator.getUserMedia(constraints, successCallback5, errorCallback);
-      // }
-      //
-      // function successCallback5(stream) {
-      //   newstream.addTrack(stream.getAudioTracks()[0]);
-      //   pc.addStream(newstream);
-      //   //如果是发起方则发送一个offer信令
-      //
-      //
-      //   pc.createOffer(sendOfferFn, function (error) {
-      //          console.log('Failure callback: ' + error);
-      //       });
-      //   //pc.addStream(newstream);
-      //
-      //
-      // }
+
 
 
       remotevideo();
