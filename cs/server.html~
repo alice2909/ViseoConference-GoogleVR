@@ -11,6 +11,7 @@
     -->
     <!-- CSS -->
     <link rel="stylesheet" type="text/css" href="style1.css" />
+     <meta name="viewport" container=width=device-width>
     <script type="text/javascript">
 
 
@@ -28,7 +29,7 @@
         var pc;
         var sendChannel;
         function start() {
-            var webSocket =new WebSocket("ws://192.168.43.253:5568");
+            var webSocket =new WebSocket("wss://192.168.43.253:5568");
 
             webSocket.onopen = function(event) {
               onOpen(event);
@@ -42,17 +43,18 @@
                 //document.getElementById('messages').innerHTML
                 //+= '<br/>'+str(event.data);
                 alert(event.data);
-            }
-             var iceServer = {
+            };
+            
+            var iceServer = {
                     "iceServers": [{
                         "url": "stun:stun.l.google.com:19302"
                     }]
-                };
+            };
             pc = new webkitRTCPeerConnection(iceServer);
 
 
-            pc.onaddstream = function(event){
-                //alert("æ£€æµ‹åˆ°æµ�");
+            //pc.onaddstream = function(event){
+            pc.ontrack = function(event){
                 //alert(event.stream.getTracks().length);
                var remoteMedia1 = new webkitMediaStream();
                var remoteMedia2 = new webkitMediaStream();
@@ -155,26 +157,7 @@
                 }));
             };
 
-            // èŽ·å�–æœ¬åœ°éŸ³é¢‘å’Œè§†é¢‘æµ�
-           /* navigator.webkitGetUserMedia({
-                "audio": true,
-                "video": true
-            }, function(stream){
-                //ç»‘å®šæœ¬åœ°åª’ä½“æµ�åˆ°videoæ ‡ç­¾ç”¨äºŽè¾“å‡º
-               // document.getElementById('localVideo').src = URL.createObjectURL(stream);
-                //å�‘PeerConnectionä¸­åŠ å…¥éœ€è¦�å�‘é€�çš„æµ�
-                pc.addStream(stream);
-                //å¦‚æžœæ˜¯å�‘èµ·æ–¹åˆ™å�‘é€�ä¸€ä¸ªofferä¿¡ä»¤
 
-                pc.createOffer(sendOfferFn, function (error) {
-                   console.log('Failure callback: ' + error);
-                });
-
-            }, function(error){
-                //å¤„ç�†åª’ä½“æµ�åˆ›å»ºå¤±è´¥é”™è¯¯
-                console.log('getUserMedia error: ' + error);
-            });
-            */
             //å¤„ç�†åˆ°æ�¥çš„ä¿¡ä»¤
             webSocket.onmessage = function(event){
                 //alert(event.data)
@@ -186,19 +169,21 @@
                 //å¦‚æžœæ˜¯ä¸€ä¸ªICEçš„å€™é€‰ï¼Œåˆ™å°†å…¶åŠ å…¥åˆ°PeerConnectionä¸­ï¼Œå�¦åˆ™è®¾å®šå¯¹æ–¹çš„sessionæ��è¿°ä¸ºä¼ é€’è¿‡æ�¥çš„æ��è¿°
 
                 if( json.event == "_ice_candidate" ){
-                    //alert("æ”¶åˆ°å€™é€‰");
+                    alert("ice_candidate");
                     pc.addIceCandidate(new RTCIceCandidate(json.data.candidate));
 
-                } else {
+                } 
+                else {
 
                    if(json.event == "_offer") {
+                       alert("offer");
                        pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp),function(){
-                       //pc.setRemoteDescription(null,function()
                            pc.createAnswer(sendAnswerFn, function (error) {
-                                alert(error);
+                                alert("error");
                                 console.log('Failure callback: ' + error);
                             });
-                       },function(){
+                       },
+                       function(){
                             alert("error");
                             pc.createAnswer(sendAnswerFn, function (error) {
                                 alert("error");
@@ -233,10 +218,21 @@
         }
 
 
+
     </script>
   </head>
 
   <body>
+    
+    <div class="container">
+        <p>orientation checking</p>
+     </div>
+
+    <script>
+       window.addEventListener('orientationchange',function()
+		{console.log('orientation changed');
+	  },false)
+    </script>
     <input type="submit" value="Adminlogin" onclick="start()">
     <!-- <input type="submit" value="send" onclick="sendData()"> -->
     <div id="messages">

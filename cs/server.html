@@ -11,6 +11,7 @@
     -->
     <!-- CSS -->
     <link rel="stylesheet" type="text/css" href="style1.css" />
+     <meta name="viewport" container=width=device-width>
     <script type="text/javascript">
 
 
@@ -217,10 +218,21 @@
         }
 
 
+
     </script>
   </head>
 
   <body>
+    
+    <div class="container">
+        <p>orientation checking</p>
+     </div>
+
+    <script>
+       window.addEventListener('orientationchange',function()
+		{console.log('orientation changed');
+	  },false)
+    </script>
     <input type="submit" value="Adminlogin" onclick="start()">
     <!-- <input type="submit" value="send" onclick="sendData()"> -->
     <div id="messages">
