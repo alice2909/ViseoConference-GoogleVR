@@ -258,9 +258,12 @@
 		 // Listen for the event and handleiceOrientationEvent object
 	  	 window.addEventListener('deviceorientation',
 				 devOrientHandler, false);
+		 console.log(" avant le innerHTML\t");
 		 document.getElementById("doEvent").innerHTML = "DeviceOrientation";
 		  // Listen for the deviceorientation event and handle the raw data
+		 
 		 window.addEventListener('deviceorientation', function(eventData) {
+					 console.log(" dans la fonction du listener  \t");
 		        // gamma is the left-to-right tilt in degrees, where right is positive
 		       var tiltLR = eventData.gamma;
 
@@ -275,7 +278,9 @@
 		       console.log(tiltdir);
 			deviceOrientationHandler(tiltLR, tiltFB, dir);
 	  		 }, false);
-	}) } else {
+		})
+	 } 
+	else {
 	  document.getElementById("doEvent").innerHTML = "Not supported."
 	}
 
