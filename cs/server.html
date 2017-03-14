@@ -169,14 +169,14 @@
                 //å¦‚æžœæ˜¯ä¸€ä¸ªICEçš„å€™é€‰ï¼Œåˆ™å°†å…¶åŠ å…¥åˆ°PeerConnectionä¸­ï¼Œå�¦åˆ™è®¾å®šå¯¹æ–¹çš„sessionæ��è¿°ä¸ºä¼ é€’è¿‡æ�¥çš„æ��è¿°
 
                 if( json.event == "_ice_candidate" ){
-                    alert("ice_candidate");
+                    //alert("ice_candidate");
                     pc.addIceCandidate(new RTCIceCandidate(json.data.candidate));
 
                 } 
                 else {
 
                    if(json.event == "_offer") {
-                       alert("offer");
+                       //alert("offer");
                        pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp),function(){
                            pc.createAnswer(sendAnswerFn, function (error) {
                                 alert("error");
