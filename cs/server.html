@@ -251,14 +251,6 @@
      //we check if deviceorientation is supported by the apparatus
       if(window.DeviceOrientationEvent){
 		  console.log("DeviceOrientation is supported");
-	      	  //window.addEventListener('orientationchange',function()
-		 //	{console.log('orientation changed');
-		  //},false)
-
-		 // Listen for the event and handleiceOrientationEvent object
-	  	 window.addEventListener('deviceorientation',
-				 devOrientHandler, false);
-		 document.getElementById("doEvent").innerHTML = "DeviceOrientation";
 		  // Listen for the deviceorientation event and handle the raw data
 		 window.addEventListener('deviceorientation', function(eventData) {
 
@@ -269,14 +261,16 @@
 		       var tiltFB = eventData.beta;
  
 		        // alpha is the compass direction the device is facing in degrees
-              	       var dir = eventData.alpha
- 		 
-		       console.log(tiltLR);		
+              	       var dir = eventData.alpha;
+ 		       //alert(tiltLR);
+ 		       //alert(tiltFB);
+ 		       //alert(dir);
+ 		       
+		      /* console.log(tiltLR);		
                        console.log(tiltFB);
-		       console.log(tiltdir);
-			deviceOrientationHandler(tiltLR, tiltFB, dir);
-	  		 }, false);
-		})
+		       console.log(dir);*/
+		       //deviceOrientationHandler(tiltLR, tiltFB, dir);
+	  	  }, false);
 	 } 
 
 	else {
