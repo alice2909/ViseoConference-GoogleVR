@@ -41,6 +41,9 @@
   }
 
 /*
+
+FONCTIONS DEPRECIEES
+
   function gotSources(sourceInfos) {
     for (var i = 0; i !== sourceInfos.length; ++i) {
       var sourceInfo = sourceInfos[i];
@@ -63,16 +66,14 @@
   //    }
     }
   }
-  */
   
   
-//7/3/17: mediastreamtrack.getSources deprecated
- /* if (typeof MediaStreamTrack.getSources == 'undefined') {
+  if (typeof MediaStreamTrack.getSources == 'undefined') {
     alert('This browser does not support MediaStreamTrack.\n\nTry Chrome version < 40.');
   } else {
     MediaStreamTrack.getSources(gotSources);
-  }*/
-  /*
+  }
+  
   if (typeof MediaDevices.gotDevices == 'undefined') {
     alert('This browser does not support MediaSDevices.\n\nTry Chrome.');
   } else {
