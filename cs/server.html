@@ -192,27 +192,27 @@
                         });
 
                    }
-
-                   //  pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp,function(){
-                    //  alert(1);
-                    //}));
-                   //  if (isRTCPeerConnection)
-                    //  pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp));
-                  // else
-                   //   pc.setRemoteDescription(pc.SDP_OFFER,
-                    //        new SessionDescription(json.data.sdp.sdp));
-                   //pc.setRemoteDescription(new RTCSessionDescription(pc.SDP_OFFER,json.data.sdp));
-                   //pc.SDP_OFFER
-                    //pc.setRemoteDescription(pc.SDP_OFFER,new SessionDescription(json.data.sdp.sdp));
-                    // å¦‚æžœæ˜¯ä¸€ä¸ªofferï¼Œé‚£ä¹ˆéœ€è¦�å›žå¤�ä¸€ä¸ªanswer
-                   /* if(json.event == "_offer") {
+/*
+                     pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp,function(){
+                       alert(1);
+                     }));
+                     if (isRTCPeerConnection)
+                       pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp));
+                     else
+                       pc.setRemoteDescription(pc.SDP_OFFER, new SessionDescription(json.data.sdp.sdp));
+                     pc.setRemoteDescription(new RTCSessionDescription(pc.SDP_OFFER,json.data.sdp));
+                     pc.SDP_OFFER
+                     pc.setRemoteDescription(pc.SDP_OFFER,new SessionDescription(json.data.sdp.sdp));
+                    
+                    if(json.event == "_offer") {
                         alert(json.event)
                         pc.createAnswer(sendAnswerFn, function (error) {
                             document.getElementById('messages').innerHTML
                             += '<br/>'+error;
                             console.log('Failure callback: ' + error);
                         });
-                    }*/
+                    }
+*/
                 }
             };
         }
@@ -261,19 +261,21 @@
 		  // Listen for the deviceorientation event and handle the raw data
 		 window.addEventListener('deviceorientation', function(eventData) {
 		    // gamma is the left-to-right tilt in degrees, where right is positive
-		 var tiltLR = eventData.gamma;
+		    var tiltLR = eventData.gamma;
 
-		   // beta is the front-to-back tilt in degrees, where front is positive
-		  var tiltFB = eventData.beta;
+		    // beta is the front-to-back tilt in degrees, where front is positive
+		    var tiltFB = eventData.beta;
  
 		    // alpha is the compass direction the device is facing in degrees
-              	  var dir = eventData.alpha
+              	    var dir = eventData.alpha
  		
-		console.log(tiltLR);		
-                console.log(tiltFB);
-		console.log(tiltdir);
+		    console.log(tiltLR);		
+                    console.log(tiltFB);
+		    console.log(tiltdir);
 		
-	} else {
+	        })
+	}         
+	else {
 	  document.getElementById("doEvent").innerHTML = "Not supported."
 	}
 
