@@ -275,7 +275,9 @@
 		    // call our orientation event handler
 		   deviceOrientationHandler(tiltLR, tiltFB, dir);
 		  }, false);
-
+		console.log(tiltLR);		
+                console.log(tiltFB);
+		console.log(tiltdir);
 		document.getElementById("doTiltLR").innerHTML = Math.round(tiltLR);
 		document.getElementById("doTiltFB").innerHTML = Math.round(tiltFB);
 		document.getElementById("doDirection").innerHTML = Math.round(dir);
@@ -287,11 +289,13 @@
 		logo.style.MozTransform = "rotate("+ tiltLR +"deg)";
 		logo.style.transform =
 		  "rotate("+ tiltLR +"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
-} else {
-  document.getElementById("doEvent").innerHTML = "Not supported."
-}
+
+		
+	} else {
+	  document.getElementById("doEvent").innerHTML = "Not supported."
 	}
-	else { console.log("This device does not support DeviceOrientation");}
+
+	
     </script>
     <input type="submit" value="Adminlogin" onclick="start()">
     <!-- <input type="submit" value="send" onclick="sendData()"> -->

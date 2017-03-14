@@ -275,8 +275,10 @@
 		    // call our orientation event handler
 		   deviceOrientationHandler(tiltLR, tiltFB, dir);
 		  }, false);
-		
-		 document.getElementById("doTiltLR").innerHTML = Math.round(tiltLR);
+		console.log(tiltLR);		
+                console.log(tiltFB);
+		console.log(tiltdir);
+		document.getElementById("doTiltLR").innerHTML = Math.round(tiltLR);
 		document.getElementById("doTiltFB").innerHTML = Math.round(tiltFB);
 		document.getElementById("doDirection").innerHTML = Math.round(dir);
 
