@@ -19,7 +19,7 @@ function onOpen(event) {
 
   function start() {
 
-      var webSocket =new WebSocket("ws://192.168.43.253:5568");
+      var webSocket =new WebSocket("wss://192.168.43.253:5568");
         webSocket.onopen = function(event) {
         onOpen(event);
       };
@@ -172,7 +172,7 @@ function onOpen(event) {
 
 
       //处理到来的信令
-      webSocket.onmessage = function(event){
+      webSocket.onMessage = function(event){
           //alert(event.data);
           //document.getElementById('messages').innerHTML
          // += '<br/>'+event.data;

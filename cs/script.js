@@ -7,10 +7,40 @@
   var videoSelect = document.querySelector('select#videoSource');
   var videoSelect2 = document.querySelector('select#videoSource2');
 
-  navigator.getUserMedia =  navigator.getUserMedia
+ /* navigator.getUserMedia =  navigator.getUserMedia
   						||navigator.webkitGetUserMedia
-  						||navigator.mozGetUserMedia;
+  						||navigator.mozGetUserMedia;*/
+  						
+  navigator.mediaDevices.enumerateDevices()
+  .then(gotDevices)
+  .catch(errorCallback);
 
+  function gotDevices(deviceInfos) {
+
+  for (var i = 0; i !== deviceInfos.length; ++i) {
+    var deviceInfo = deviceInfos[i];
+    var option = document.createElement('option');
+    option.value = deviceInfo.deviceId;
+    var option2 = document.createElement('option');
+    option2.value = deviceInfo.deviceId;
+    if (deviceInfo.kind === 'audio') {
+      option.text = deviceInfo.label ||
+        'Microphone ' + (audioSelect.length + 1);
+      audioSelect.appendChild(option);
+    } 
+    else if (deviceInfo.kind === 'video') {
+      option.text = deviceInfo.label || 'Camera ' +
+        (videoSelect.length + 1);
+      videoSelect.appendChild(option);
+      option2.text = deviceInfo.label || 'Camera ' +
+        (videoSelect2.length + 1);
+      videoSelect2.appendChild(option);
+    }
+    }
+
+  }
+
+/*
   function gotSources(sourceInfos) {
     for (var i = 0; i !== sourceInfos.length; ++i) {
       var sourceInfo = sourceInfos[i];
@@ -33,12 +63,24 @@
   //    }
     }
   }
-
-  if (typeof MediaStreamTrack.getSources == 'undefined') {
-    alert('This browser does not support MediaStreamTrack.\n\nTry Chrome.');
+  */
+  
+  
+//7/3/17: mediastreamtrack.getSources deprecated
+ /* if (typeof MediaStreamTrack.getSources == 'undefined') {
+    alert('This browser does not support MediaStreamTrack.\n\nTry Chrome version < 40.');
   } else {
     MediaStreamTrack.getSources(gotSources);
-  }
+  }*/
+  /*
+  if (typeof MediaDevices.gotDevices == 'undefined') {
+    alert('This browser does not support MediaSDevices.\n\nTry Chrome.');
+  } else {
+    MediaDevices.gotDevices(gotDevices);
+  }*/
+
+
+
 
   function successCallback0(stream) {
     window.stream = stream; // make stream available to console
@@ -58,8 +100,9 @@
   	}
 
   function errorCallback(error) {
-    console.log('navigator.getUserMedia error: ', error);
+    console.log('navigator.mediaDevices error: ', error);
   }
+
 
   function audio() {
     if (window.stream) {
@@ -74,7 +117,9 @@
         }]
       }
     };
-    navigator.getUserMedia(constraints, successCallback0, errorCallback);
+    navigator.mediaDevices.getUserMedia(constraints)
+    .then(successCallback0)
+    .catch(errorCallback);
   }
 
   function video() {
@@ -90,7 +135,9 @@
   	      }]
   	    }
   	  };
-  	  navigator.getUserMedia(constraints, successCallback1, errorCallback);
+  	  navigator.mediaDevices.getUserMedia(constraints)
+  	  .then(successCallback1)
+  	  .catch(errorCallback);
   }
 
   function video2() {
@@ -106,7 +153,9 @@
   	      }]
   	    }
   	  };
-  	  navigator.getUserMedia(constraints, successCallback2, errorCallback);
+  	  navigator.mediaDevices.getUserMedia(constraints)
+  	  .then(successCallback2)
+  	  .catch(errorCallback);
   }
 
   audioSelect.onchange = audio1;
