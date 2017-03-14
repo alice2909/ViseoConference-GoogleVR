@@ -229,9 +229,17 @@
      </div>
 
     <script>
-       window.addEventListener('orientationchange',function()
-		{console.log('orientation changed');
-	  },false)
+     //we check if deviceorientation is supported by the apparatus
+      if(window.DeviceOrientationEvent){
+		console.log("DeviceOrientation is supported");
+      		 //window.addEventListener('orientationchange',function()
+		//	{console.log('orientation changed');
+	  	//},false)
+		// Listen for the event and handleiceOrientationEvent object
+  		window.addEventListener('deviceorientation',
+				 devOrientHandler, false);
+	}
+	else { console.log("This device does not support DeviceOrientation");}
     </script>
     <input type="submit" value="Adminlogin" onclick="start()">
     <!-- <input type="submit" value="send" onclick="sendData()"> -->
