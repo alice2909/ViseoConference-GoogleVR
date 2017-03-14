@@ -169,14 +169,14 @@
                 //å¦‚æžœæ˜¯ä¸€ä¸ªICEçš„å€™é€‰ï¼Œåˆ™å°†å…¶åŠ å…¥åˆ°PeerConnectionä¸­ï¼Œå�¦åˆ™è®¾å®šå¯¹æ–¹çš„sessionæ��è¿°ä¸ºä¼ é€’è¿‡æ�¥çš„æ��è¿°
 
                 if( json.event == "_ice_candidate" ){
-                    alert("ice_candidate");
+                    //alert("ice_candidate");
                     pc.addIceCandidate(new RTCIceCandidate(json.data.candidate));
 
                 } 
                 else {
 
                    if(json.event == "_offer") {
-                       alert("offer");
+                       //alert("offer");
                        pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp),function(){
                            pc.createAnswer(sendAnswerFn, function (error) {
                                 alert("error");
@@ -244,10 +244,7 @@
       <td id="doDirection"></td>
     </tr>
    </table>
-</div>
-
-<div class="container" style="perspective: 300;">
-  <img src="html5_logo.png" id="imgLogo" class="logo">
+  
 </div>
 
     <script>
@@ -271,25 +268,10 @@
  
 		    // alpha is the compass direction the device is facing in degrees
               	  var dir = eventData.alpha
-
-		    // call our orientation event handler
-		   deviceOrientationHandler(tiltLR, tiltFB, dir);
-		  }, false);
+ 		
 		console.log(tiltLR);		
                 console.log(tiltFB);
 		console.log(tiltdir);
-		document.getElementById("doTiltLR").innerHTML = Math.round(tiltLR);
-		document.getElementById("doTiltFB").innerHTML = Math.round(tiltFB);
-		document.getElementById("doDirection").innerHTML = Math.round(dir);
-
-		// Apply the transform to the image
-		var logo = document.getElementById("imgLogo");
-		logo.style.webkitTransform =
-		  "rotate("+ tiltLR +"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
-		logo.style.MozTransform = "rotate("+ tiltLR +"deg)";
-		logo.style.transform =
-		  "rotate("+ tiltLR +"deg) rotate3d(1,0,0, "+ (tiltFB*-1)+"deg)";
-
 		
 	} else {
 	  document.getElementById("doEvent").innerHTML = "Not supported."
