@@ -170,7 +170,10 @@
 
                 if( json.event == "_ice_candidate" ){
                     //alert("ice_candidate");
-                    pc.addIceCandidate(new RTCIceCandidate(json.data.candidate));
+                    var cand= new RTCIceCandidate(json.data.candidate);
+                    pc.addIceCandidate(cand)
+                        .then()
+                        .catch(console.log("Error: Failure during addIceCandidate()"));
 
                 } 
                 else {
