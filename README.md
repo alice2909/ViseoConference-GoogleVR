@@ -21,8 +21,15 @@ For sending the data catched in port 50000 where on put the informations de rota
 For sending an audio on stereo from a client to a server 
 
 # Order of starting this program
+Preparation: 2017
+Sur toutes les machines où on souhaite exécuter les express server et client il faut préalablement télécharger rootCA.crt pour pouvoir avoir le certificat permettant d'attester que la connexion est sécurisée.
+lancer les commandes node httpserver.js et node websocket_server.js sur 2 terminaux différents (ils sont dans les dossiers cs et websocket_server). 
+Il faut cependant changer l'adresse présente dans le code par votre adresse ip: ici 192.168.43.253
+Puis on lance dans chrome :
+https://#votre adresse ip#:5000/server.html et https://#votre adresse ip#:5000/client.html
 
-Preparation:
+
+Preparation: 2016
 Connect two cameras and microphones to client's computer, connect Arduino uno and Oculus Rift to server's computer
 
 1. Start websocket-server.js by command 'node websocket-server.js'(if you want to test stereo effect, you have to start another websocket server too, like 'node websocket-server1.js')
