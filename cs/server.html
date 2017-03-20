@@ -192,27 +192,6 @@
                         });
 
                    }
-/*
-                     pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp,function(){
-                       alert(1);
-                     }));
-                     if (isRTCPeerConnection)
-                       pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp));
-                     else
-                       pc.setRemoteDescription(pc.SDP_OFFER, new SessionDescription(json.data.sdp.sdp));
-                     pc.setRemoteDescription(new RTCSessionDescription(pc.SDP_OFFER,json.data.sdp));
-                     pc.SDP_OFFER
-                     pc.setRemoteDescription(pc.SDP_OFFER,new SessionDescription(json.data.sdp.sdp));
-                    
-                    if(json.event == "_offer") {
-                        alert(json.event)
-                        pc.createAnswer(sendAnswerFn, function (error) {
-                            document.getElementById('messages').innerHTML
-                            += '<br/>'+error;
-                            console.log('Failure callback: ' + error);
-                        });
-                    }
-*/
                 }
             };
         }
@@ -248,27 +227,62 @@
 </div>
 
     <script>
+
+       // create an http object
+	function makeHttpObject() {
+		  try {return new XMLHttpRequest();}
+		  catch (erreur) {}
+	  	  throw new Error("La création de l’objet pour les requêtes HTTP n’a pas pu avoir lieu.");
+	}
+	
+	
+	
+    ////we declare the js the object that will contain the motion data of the mobile
+	var obj = {
+	    length: 0,
+
+	    ajoutElem: function ajoutElem (elem) {
+		// obj.length est automatiquement incrémenté
+		// quand on ajoute un élément
+		[].push.call(this, elem);
+	    }
+	};
+
+//create the http request
+	var requete = makeHttpObject();
+
+	
+
      //we check if deviceorientation is supported by the apparatus
       if(window.DeviceOrientationEvent){
 		  console.log("DeviceOrientation is supported");
 		  // Listen for the deviceorientation event and handle the raw data
-		 window.addEventListener('deviceorientation', function(eventData) {
+		  window.addEventListener('deviceorientation', function(eventData) {
 		        // gamma is the left-to-right tilt in degrees, where right is positive
 		       var tiltLR = eventData.gamma;
-
+				
 		        // beta is the front-to-back tilt in degrees, where front is positive
 		       var tiltFB = eventData.beta;
  
 		        // alpha is the compass direction the device is facing in degrees
               	       var dir = eventData.alpha;
- 		       //alert(tiltLR);
- 		       //alert(tiltFB);
- 		       //alert(dir);
- 		       
-		      /* console.log(tiltLR);		
-                       console.log(tiltFB);
-		       console.log(dir);*/
+			// we show the data motion on the phone 
+ 		         //print(tiltLR);
+ 		         //print(tiltFB);
+ 		         //print(dir);
+			
+			//la requête
+			// we add the motion data to the json table
+ 		       	requete.jsonp('some/trusted/url', {jsonpCallbackParam: obj.ajoutElem();}
+			requete.open("GET", obj, false);
+			requete.send(null);
+			//we try to print the data motion
+		     	print(requete.getAllResponseHeaders());
+			console.log(requete.getAllResponseHeaders());
 		       //deviceOrientationHandler(tiltLR, tiltFB, dir);
+			
+			// on supprime l'objet 
+		  obj.delete;
 	  	  }, false);
 	 } 
 
