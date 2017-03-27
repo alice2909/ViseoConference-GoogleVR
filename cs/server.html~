@@ -158,7 +158,7 @@
             };
 
 
-            //å¤„ç�†åˆ°æ�¥çš„ä¿¡ä»¤
+          
             webSocket.onmessage = function(event){
                 //alert(event.data)
                 //document.getElementById('messages').innerHTML
@@ -166,11 +166,22 @@
                 var jsonstr="'"+event.data+"'"
                 var json = JSON.parse(event.data);
                 console.log('onmessage: ', json);
-                //å¦‚æžœæ˜¯ä¸€ä¸ªICEçš„å€™é€‰ï¼Œåˆ™å°†å…¶åŠ å…¥åˆ°PeerConnectionä¸­ï¼Œå�¦åˆ™è®¾å®šå¯¹æ–¹çš„sessionæ��è¿°ä¸ºä¼ é€’è¿‡æ�¥çš„æ��è¿°
+            
 
                 if( json.event == "_ice_candidate" ){
                     //alert("ice_candidate");
-                    pc.addIceCandidate(new RTCIceCandidate(json.data.candidate));
+                    var cand= new RTCIceCandidate(json.data.candidate);
+                    pc.addIceCandidate(cand)
+                        .then(
+                        //function(val) {
+           // console.log('Then val: ', val );
+       // }
+        )
+                        .catch(function(reason) {
+            console.log('Error: Failure during addIceCandidate(): '+reason+' here.');
+        }
+        //console.log()
+        );
 
                 } 
                 else {
@@ -229,16 +240,16 @@
     <script>
 
        // create an http object
-	function makeHttpObject() {
+/*	function makeHttpObject() {
 		  try {return new XMLHttpRequest();}
 		  catch (erreur) {}
 	  	  throw new Error("La création de l’objet pour les requêtes HTTP n’a pas pu avoir lieu.");
 	}
 	
+*/	
 	
-	
-    ////we declare the js the object that will contain the motion data of the mobile
-	var obj = {
+    //we declare the js the object that will contain the motion data of the mobile
+/*	var obj = {
 	    length: 0,
 
 	    ajoutElem: function ajoutElem (elem) {
@@ -247,13 +258,30 @@
 		[].push.call(this, elem);
 	    }
 	};
-
+*/
 //create the http request
-	var requete = makeHttpObject();
+	//var requete = makeHttpObject();
 
-	
+//On fait une connexion UDP entre le clinet et le serveur
+//create the socket
+var data=[ "well","done"];
+	if(chrome.sockets){
+		//we create he first socket
+		chrome.sockets.udp.create( "udp", function callback{console.log("chrome.socket is supported \t");});
+		//we connect the socket to the local adress
+ 		chrome.socket.connect(1, 192.168.43.253, 5060, function {console.log("successful connection to remote machine \t");});
+		//send the first message 
 
-     //we check if deviceorientation is supported by the apparatus
+		 chrome.socket.write(1,data, function {console.log("sending messages from client to server");}); 
+		//}) 
+		// disconnect the client from the server
+		chrome.socket.disconnect(1);
+	}
+      
+	else {
+		console.log("chrome.socket is not supported !!!! \t");
+	}
+	     //we check if deviceorientation is supported by the apparatus
       if(window.DeviceOrientationEvent){
 		  console.log("DeviceOrientation is supported");
 		  // Listen for the deviceorientation event and handle the raw data
@@ -266,26 +294,19 @@
  
 		        // alpha is the compass direction the device is facing in degrees
               	       var dir = eventData.alpha;
-			// we show the data motion on the phone 
- 		         //print(tiltLR);
- 		         //print(tiltFB);
- 		         //print(dir);
-			
-			//la requête
-			// we add the motion data to the json table
- 		       	requete.jsonp('some/trusted/url', {jsonpCallbackParam: obj.ajoutElem();}
-			requete.open("GET", obj, false);
-			requete.send(null);
+	
 			//we try to print the data motion
-		     	print(requete.getAllResponseHeaders());
+
 			console.log(requete.getAllResponseHeaders());
 		       //deviceOrientationHandler(tiltLR, tiltFB, dir);
+
 	  	  }, false);
 	 } 
 
 	else {
 	  document.getElementById("doEvent").innerHTML = "Not supported."
 	}
+
 
 	
     </script>
