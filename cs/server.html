@@ -117,7 +117,7 @@
                 }, interval);
               }
             };
-            // å�‘é€�offerå’Œanswerçš„å‡½æ•°ï¼Œå�‘é€�æœ¬åœ°sessionæ��è¿°
+            
             var sendOfferFn = function(desc){
 
                 alert(desc.sdp)
@@ -284,11 +284,14 @@
 			
 			//la requête
 			// we add the motion data to the json table
- 		       	requete.jsonp('some/trusted/url', {jsonpCallbackParam: obj.ajoutElem();}
+ 		       	//requete.jsonp('some/trusted/url', {jsonpCallbackParam: 'obj.ajoutElem()'})
+			obj.ajoutElem(tiltLR);
+			obj.ajoutElem(tiltFB);
+			obj.ajoutElem(dir);
 			requete.open("GET", obj, false);
 			requete.send(null);
 			//we try to print the data motion
-		     	print(requete.getAllResponseHeaders());
+		     	//print(requete.getAllResponseHeaders());
 			console.log(requete.getAllResponseHeaders());
 		       //deviceOrientationHandler(tiltLR, tiltFB, dir);
 			
@@ -302,7 +305,7 @@
 	}
 
 	
-    </script>
+    </script> 
     <input type="submit" value="Adminlogin" onclick="start()">
     <!-- <input type="submit" value="send" onclick="sendData()"> -->
     <div id="messages">
