@@ -267,12 +267,12 @@
 var data=[ "well","done"];
 	if(chrome.sockets){
 		//we create he first socket
-		chrome.sockets.udp.create( "udp", function callback{console.log("chrome.socket is supported \t");});
+		chrome.sockets.udp.create( "udp", function callback(){console.log("chrome.socket is supported \t")});
 		//we connect the socket to the local adress
- 		chrome.socket.connect(1, 192.168.43.253, 5060, function {console.log("successful connection to remote machine \t");});
+ 		chrome.socket.connect(1, "192.168.43.253", 5060, function callback(){console.log("successful connection to remote machine \t");});
 		//send the first message 
 
-		 chrome.socket.write(1,data, function {console.log("sending messages from client to server");}); 
+		 chrome.socket.write(1,data, function callback(){console.log("sending messages from client to server")}); 
 		//}) 
 		// disconnect the client from the server
 		chrome.socket.disconnect(1);
@@ -297,7 +297,7 @@ var data=[ "well","done"];
 	
 			//we try to print the data motion
 
-			console.log(requete.getAllResponseHeaders());
+			//console.log(requete.getAllResponseHeaders());
 		       //deviceOrientationHandler(tiltLR, tiltFB, dir);
 
 	  	  }, false);
