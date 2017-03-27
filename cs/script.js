@@ -34,7 +34,7 @@
       videoSelect.appendChild(option);
       option2.text = deviceInfo.label || 'Camera ' +
         (videoSelect2.length + 1);
-      videoSelect2.appendChild(option);
+      videoSelect2.appendChild(option2);
     }
     }
 
