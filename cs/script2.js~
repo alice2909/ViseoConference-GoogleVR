@@ -15,10 +15,6 @@ var iceServer = { "iceServers": [{"url": "stun:stun.l.google.com:19302"}] };
 
 function start() {
     var webSocket =new WebSocket("wss://192.168.43.253:5568");
-
-   //we declare a new spcket for the mobile motion information
-    var socketmotion=new WebSocket("wss://192.168.43.253:5500");
-
     webSocket.onopen = function(event) {
         onOpen(event);
     };
@@ -30,6 +26,9 @@ function start() {
         //+= '<br/>'+str(event.data);
         alert(event.data)
     }
+
+
+
 	socketmotion.onopen = function(event) {
               onOpen(event);
             };
@@ -39,14 +38,12 @@ function start() {
             };
 
             socketmotion.onclose=function(event){
-               
+                //document.getElementById('messages').innerHTML
+                //+= '<br/>'+str(event.data);
                 alert(event.data);
             };
     var pc = new webkitRTCPeerConnection(iceServer);
     
-    //we create new connection between the mobile and the server (computer)
-     MobileToPc= new webkitRTCPeerConnection(iceServer);
-	
     function send(message) {
         waitForConnection(function () {webSocket.send(message);}, 1000);
     };
