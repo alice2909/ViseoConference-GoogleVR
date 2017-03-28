@@ -27,7 +27,8 @@ function start() {
         alert(event.data)
     }
 
-    var pc = new RTCPeerConnection(iceServer);
+
+    var pc = new webkitRTCPeerConnection(iceServer);
     
     function send(message) {
         waitForConnection(function () {webSocket.send(message);}, 1000);

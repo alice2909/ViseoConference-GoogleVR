@@ -35,6 +35,9 @@
         function start() {
             var webSocket =new WebSocket("wss://192.168.43.253:5568");
 
+	    //we declare a new spcket for the mobile motion information
+	    var socketmotion=new WebSocket("wss://192.168.43.253:5500");
+	
             webSocket.onopen = function(event) {
               onOpen(event);
             };
@@ -47,39 +50,58 @@
                 alert(event.data);
             };
             
+	    socketmotion.onopen = function(event) {
+              onOpen(event);
+            };
+
+            socketmotion.onerror = function(event) {
+                  onError(event);
+            };
+
+            socketmotion.onclose=function(event){
+                //document.getElementById('messages').innerHTML
+                //+= '<br/>'+str(event.data);
+                alert(event.data);
+            };
             var iceServer = {
                     "iceServers": [{
                         "url": "stun:stun.l.google.com:19302"
                     }]
             };
+
             
             
             //pc = new webkitRTCPeerConnection(iceServer);
-            pc = new RTCPeerConnection(iceServer);
-	    
+            pc = new webkitRTCPeerConnection(iceServer);
+
             //pc.onaddstream = function(event){
             pc.addstream;
             pc.ontrack = function(event){
                 //alert(event.stream.getTracks().length);
-               var remoteMedia1 = new MediaStream();
-               var remoteMedia2 = new MediaStream();
+               var remoteMedia1 = new webkitMediaStream();
+               var remoteMedia2 = new webkitMediaStream();
               // var remoteMedia3 = new webkitMediaStream();
                event.stream.getVideoTracks()[0].enabled = true;
                event.stream.getVideoTracks()[1].enabled = true;
               // event.stream.getAudioTracks()[0].enabled = true;
-
+		 
 
                remoteMedia1.addTrack(event.stream.getVideoTracks()[0]);
                remoteMedia2.addTrack(event.stream.getVideoTracks()[1]);
-              // remoteMedia3.addTrack(event.stream.getAudioTracks()[0]);
+
+               remoteMedia1.addTrack(event.stream.getVideoTracks()[0]);
+               remoteMedia2.addTrack(event.stream.getVideoTracks()[1]);
+
                document.getElementById('remoteVideo').src = URL.createObjectURL(remoteMedia1);
                document.getElementById('remoteVideo1').src = URL.createObjectURL(remoteMedia2);
-              // document.getElementById('remoteAudio').src = URL.createObjectURL(remoteMedia3);
-                // var sound = new Audio(event.stream.getAudioTracks()[0]);
-                // sound.play();
 
             };
 
+
+
+
+		//we create new connection between the mobile and the server (computer)
+	      MobileToPc= new webkitRTCPeerConnection(iceServer);
 
             function send(message) {
                 waitForConnection(function () {
@@ -91,18 +113,35 @@
                 if (webSocket.readyState === 1) {
                   callback();
                 } else {
+
+                // optional: implement backoff for interval here
+
                 setTimeout(function () {
                     waitForConnection(callback, interval);
                 }, interval);
               }
             };
             
+
+	   //we wait for the connection 
+	    function waitForConnection(callback, interval) {
+                if (socketmotion.readyState === 1) {
+                  callback();
+                } else {
+
+                // optional: implement backoff for interval here
+                setTimeout(function () {
+                    waitForConnection(callback, interval);
+                }, interval);
+              }
+            };
+
+
+
             var sendOfferFn = function(desc){
 
                 alert(desc.sdp)
-                //pc.setRemoteDescription(desc);
-               // pc.setLocalDescription(desc);
-
+              
                 send(JSON.stringify({
                     "event": "_offer",
                     "data": {
@@ -112,6 +151,9 @@
             };
 
 
+            // pc.createOffer(sendOfferFn, function (error) {
+            //           console.log('Failure callback: ' + error);
+            //         });
 
             pc.onicecandidate = function(event){
                 if (event.candidate !== null) {
@@ -185,82 +227,55 @@
                     
                 }
 
-            }
-}
+            };
+        
 
 
-    </script>
+
+ 	//same function for the others 
+
+	        socketmotion.onmessage = function(event){
+                var jsonstr="'"+event.data+"'"
+		//the clients are same as video's clients so ne need to create another json object
+                var json = JSON.parse(event.data);
+                console.log('onmessage: ', json);
+            
+
+                if( json.event == "_ice_candidate" ){
+                    var cand= new RTCIceCandidate(json.data.candidate);
+                    pc.addIceCandidate(cand)
+                        .then( )
+                        .catch(function(reason) {
+            console.log('Error: Failure during addIceCandidate(): '+reason+' here.');
+        }
+        );
+
+                } 
+                else {
+
+                   if(json.event == "_offer") {
+                       pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp),function(){
+                           pc.createAnswer(sendAnswerFn, function (error) {
+                                alert("error");
+                                console.log('Failure callback: ' + error);
+                            });
+                       },
+                       function(){
+                            alert("error");
+                            pc.createAnswer(sendAnswerFn, function (error) {
+                                alert("error");
+                                console.log('Failure callback: ' + error);
+                            });
+                        });
 
 
-    
-    <div class="main">
-  <h2>Device Orientation</h2>
-  <table>
-    <tr>
-      <td>Event Supported</td>
-      <td id="doEvent"></td>
-    </tr>
-    <tr>
-      <td>Tilt Left/Right [gamma]</td>
-      <td id="doTiltLR"></td>
-    </tr>
-    <tr>
-      <td>Tilt Front/Back [beta]</td>
-      <td id="doTiltFB"></td>
-    </tr>
-    <tr>
-      <td>Direction [alpha]</td>
-      <td id="doDirection"></td>
-    </tr>
-   </table>
-  
-</div>
-
-    <script>
-
-       // create an http object
-/*	function makeHttpObject() {
-		  try {return new XMLHttpRequest();}
-		  catch (erreur) {}
-	  	  throw new Error("La création de l’objet pour les requêtes HTTP n’a pas pu avoir lieu.");
-	}
-	
-*/	
-	
-    //we declare the js the object that will contain the motion data of the mobile
-/*	var obj = {
-	    length: 0,
-
-	    ajoutElem: function ajoutElem (elem) {
-		// obj.length est automatiquement incrémenté
-		// quand on ajoute un élément
-		[].push.call(this, elem);
-	    }
-	};
-*/
-//create the http request
-	//var requete = makeHttpObject();
-
-//On fait une connexion UDP entre le clinet et le serveur
-//create the socket
-var data=[ "well","done"];
-	if(chrome.sockets){
-		//we create he first socket
-		chrome.sockets.udp.create( "udp", function callback(){console.log("chrome.socket is supported \t")});
-		//we connect the socket to the local adress
- 		chrome.socket.connect(1, "192.168.43.253", 5060, function callback(){console.log("successful connection to remote machine \t");});
-		//send the first message 
-
-		 chrome.socket.write(1,data, function callback(){console.log("sending messages from client to server")}); 
-
-		//}) 
-		// disconnect the client from the server
-		chrome.socket.disconnect(1);
-	}
-      
-	else {
-		console.log("chrome.socket is not supported !!!! \t");
-	}
+                   }
+                }
+            };
+            
+            
+            
+        
 	     //we check if deviceorientation is supported by the apparatus
       if(window.DeviceOrientationEvent){
 		  console.log("DeviceOrientation is supported");
@@ -274,8 +289,10 @@ var data=[ "well","done"];
  
 		        // alpha is the compass direction the device is facing in degrees
               	       var dir = eventData.alpha;
-
-	
+		       
+			 socketmotion.send(tiltLR);
+			 socketmotion.send(tiltFB);
+			 socketmotion.send(dir);
 			//we try to print the data motion
 
 			//console.log(requete.getAllResponseHeaders());
@@ -288,10 +305,18 @@ var data=[ "well","done"];
 	else {
 	  document.getElementById("doEvent").innerHTML = "Not supported."
 	}
+	}
+
+    </script>
 
 
-	
-    </script> 
+    
+    <div class="main">
+  <h2>Device Orientation</h2>
+
+  
+</div>
+
     <input type="submit" value="Adminlogin" onclick="start()">
     <!-- <input type="submit" value="send" onclick="sendData()"> -->
     <div id="messages">
