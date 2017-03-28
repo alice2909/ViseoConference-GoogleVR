@@ -12,6 +12,10 @@
     <!-- CSS -->
     <link rel="stylesheet" type="text/css" href="style1.css" />
      <meta name="viewport" container=width=device-width>
+     
+  </head>
+  
+  <body>
     <script type="text/javascript">
 
 
@@ -40,8 +44,6 @@
             };
 
             webSocket.onclose=function(event){
-                //document.getElementById('messages').innerHTML
-                //+= '<br/>'+str(event.data);
                 alert(event.data);
             };
             
@@ -50,14 +52,17 @@
                         "url": "stun:stun.l.google.com:19302"
                     }]
             };
-            pc = new webkitRTCPeerConnection(iceServer);
-
-
+            
+            
+            //pc = new webkitRTCPeerConnection(iceServer);
+            pc = new RTCPeerConnection(iceServer);
+	    
             //pc.onaddstream = function(event){
+            pc.addstream;
             pc.ontrack = function(event){
                 //alert(event.stream.getTracks().length);
-               var remoteMedia1 = new webkitMediaStream();
-               var remoteMedia2 = new webkitMediaStream();
+               var remoteMedia1 = new MediaStream();
+               var remoteMedia2 = new MediaStream();
               // var remoteMedia3 = new webkitMediaStream();
                event.stream.getVideoTracks()[0].enabled = true;
                event.stream.getVideoTracks()[1].enabled = true;
@@ -76,42 +81,16 @@
             };
 
 
-            // remoteMedia.onaddtrack = function (evt) {
-            //         console.log("New remote track added");
-            //         // omitted: check to see if video track exists first before doing this
-            //         remoteMedia.getVideoTracks()[0].enabled = true;
-            //     };
-            //
-            // pc.onaddstream = function (evt) {
-            //     console.log("New stream added");
-            //     var remoteMediaStream = evt.stream;
-            //     if (remoteMedia == null) {
-            //         remoteMedia     = remoteMediaStream;
-            //         remoteVideo     = document.getElementById('remoteVideo');//avCaptureUtil.createVideoElement(toUri);
-            //         remoteVideo.src = window.URL.createObjectURL(remoteMedia);
-            //     }
-            //     else {
-            //         remoteMedia.addTrack(remoteMediaStream.getVideoTracks()[0]); //add the video track to the existing stream
-            //     }
-            //   }
-
-
-
-
-
-
             function send(message) {
                 waitForConnection(function () {
                 webSocket.send(message);
                 }, 1000);
-              };
+            };
 
            function waitForConnection(callback, interval) {
                 if (webSocket.readyState === 1) {
                   callback();
                 } else {
-                //var that = this;
-                // optional: implement backoff for interval here
                 setTimeout(function () {
                     waitForConnection(callback, interval);
                 }, interval);
@@ -131,9 +110,9 @@
                     }
                 }));
             };
-            // pc.createOffer(sendOfferFn, function (error) {
-            //           console.log('Failure callback: ' + error);
-            //         });
+
+
+
             pc.onicecandidate = function(event){
                 if (event.candidate !== null) {
                     webSocket.send(JSON.stringify({
@@ -160,59 +139,59 @@
 
           
             webSocket.onmessage = function(event){
+            
                 //alert(event.data)
                 //document.getElementById('messages').innerHTML
                 //+= '<br/>'+event.data;
+                
                 var jsonstr="'"+event.data+"'"
                 var json = JSON.parse(event.data);
                 console.log('onmessage: ', json);
-            
-
-                if( json.event == "_ice_candidate" ){
-                    //alert("ice_candidate");
+                
+                switch(json.event){
+                
+                case "_ice_candidate":
                     var cand= new RTCIceCandidate(json.data.candidate);
+                    //console.log('cand: ', cand);
                     pc.addIceCandidate(cand)
-                        .then(
-                        //function(val) {
-           // console.log('Then val: ', val );
-       // }
-        )
-                        .catch(function(reason) {
-            console.log('Error: Failure during addIceCandidate(): '+reason+' here.');
-        }
-        //console.log()
-        );
-
-                } 
-                else {
-
-                   if(json.event == "_offer") {
-                       //alert("offer");
-                       pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp),function(){
-                           pc.createAnswer(sendAnswerFn, function (error) {
-                                alert("error");
-                                console.log('Failure callback: ' + error);
-                            });
-                       },
-                       function(){
+                        .then()//function(val) {console.log('Then val: ', val );})
+                        .catch(function(reason) {console.log('Error: Failure during addIceCandidate(): '+reason+' here.'); });
+                    break;
+                    
+                case "_offer" : 
+                    pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp))
+                       .then(function(){
+                           pc.createAnswer().then(sendAnswerFn)
+                               .then()
+                               .catch(function (error) {
+                                    alert("error");
+                                    console.log('Failure callback: ' + error);
+                                });
+                        })
+                       .catch(function(){
                             alert("error");
-                            pc.createAnswer(sendAnswerFn, function (error) {
-                                alert("error");
-                                console.log('Failure callback: ' + error);
-                            });
+                            pc.createAnswer().then(sendAnswerFn)
+                               .then()
+                               .catch(function (error) {
+                                    alert("error");
+                                    console.log('Failure callback: ' + error);
+                                });
                         });
-
-                   }
+                    break;
+                    
+                default : 
+                    console.log("Unknown message received:");
+                    console.log(msg);
+                    
                 }
-            };
-        }
 
+            }
+}
 
 
     </script>
-  </head>
 
-  <body>
+
     
     <div class="main">
   <h2>Device Orientation</h2>
@@ -267,12 +246,13 @@
 var data=[ "well","done"];
 	if(chrome.sockets){
 		//we create he first socket
-		chrome.sockets.udp.create( "udp", function (callback){console.log("chrome.socket is supported \t");});
+		chrome.sockets.udp.create( "udp", function callback(){console.log("chrome.socket is supported \t")});
 		//we connect the socket to the local adress
- 		chrome.socket.connect(1, 192.168.43.253, 5060, function(){console.log("successful connection to remote machine\t");});
+ 		chrome.socket.connect(1, "192.168.43.253", 5060, function callback(){console.log("successful connection to remote machine \t");});
 		//send the first message 
 
-		 chrome.socket.write(1,data, function() {console.log("sending messages from client to server");}); 
+		 chrome.socket.write(1,data, function callback(){console.log("sending messages from client to server")}); 
+
 		//}) 
 		// disconnect the client from the server
 		chrome.socket.disconnect(1);
@@ -297,7 +277,9 @@ var data=[ "well","done"];
 
 	
 			//we try to print the data motion
-			console.log(requete.getAllResponseHeaders());
+
+			//console.log(requete.getAllResponseHeaders());
+
 		       //deviceOrientationHandler(tiltLR, tiltFB, dir);
 
 	  	  }, false);

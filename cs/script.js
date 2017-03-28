@@ -23,12 +23,12 @@
     option.value = deviceInfo.deviceId;
     var option2 = document.createElement('option');
     option2.value = deviceInfo.deviceId;
-    if (deviceInfo.kind === 'audio') {
+    if (deviceInfo.kind === 'audioinput') {
       option.text = deviceInfo.label ||
         'Microphone ' + (audioSelect.length + 1);
       audioSelect.appendChild(option);
     } 
-    else if (deviceInfo.kind === 'video') {
+    else if (deviceInfo.kind === 'videoinput') {
       option.text = deviceInfo.label || 'Camera ' +
         (videoSelect.length + 1);
       videoSelect.appendChild(option);
@@ -159,10 +159,10 @@ FONCTIONS DEPRECIEES
   	  .catch(errorCallback);
   }
 
-  audioSelect.onchange = audio1;
+  //audioSelect.onchange = audio1;
   videoSelect.onchange = video;
   videoSelect2.onchange = video2;
 
-  audio();
+ // audio();
   video();
   video2();
