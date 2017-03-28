@@ -165,7 +165,7 @@ FONCTIONS DEPRECIEES
 
 
 
- }
+}
 
   audioSelect.onchange = audio1;
   videoSelect.onchange = video;
