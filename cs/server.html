@@ -12,6 +12,10 @@
     <!-- CSS -->
     <link rel="stylesheet" type="text/css" href="style1.css" />
      <meta name="viewport" container=width=device-width>
+     
+  </head>
+  
+  <body>
     <script type="text/javascript">
 
 
@@ -43,8 +47,6 @@
             };
 
             webSocket.onclose=function(event){
-                //document.getElementById('messages').innerHTML
-                //+= '<br/>'+str(event.data);
                 alert(event.data);
             };
             
@@ -66,10 +68,14 @@
                         "url": "stun:stun.l.google.com:19302"
                     }]
             };
+
+            
+            
+            //pc = new webkitRTCPeerConnection(iceServer);
             pc = new webkitRTCPeerConnection(iceServer);
-	    
 
             //pc.onaddstream = function(event){
+            pc.addstream;
             pc.ontrack = function(event){
                 //alert(event.stream.getTracks().length);
                var remoteMedia1 = new webkitMediaStream();
@@ -93,15 +99,15 @@
 
 
 
+
 		//we create new connection between the mobile and the server (computer)
 	      MobileToPc= new webkitRTCPeerConnection(iceServer);
-
 
             function send(message) {
                 waitForConnection(function () {
                 webSocket.send(message);
                 }, 1000);
-              };
+            };
 
            function waitForConnection(callback, interval) {
                 if (webSocket.readyState === 1) {
@@ -109,6 +115,7 @@
                 } else {
 
                 // optional: implement backoff for interval here
+
                 setTimeout(function () {
                     waitForConnection(callback, interval);
                 }, interval);
@@ -143,9 +150,11 @@
                 }));
             };
 
+
             // pc.createOffer(sendOfferFn, function (error) {
             //           console.log('Failure callback: ' + error);
             //         });
+
             pc.onicecandidate = function(event){
                 if (event.candidate !== null) {
                     webSocket.send(JSON.stringify({
@@ -172,50 +181,52 @@
 
           
             webSocket.onmessage = function(event){
+            
                 //alert(event.data)
                 //document.getElementById('messages').innerHTML
                 //+= '<br/>'+event.data;
+                
                 var jsonstr="'"+event.data+"'"
                 var json = JSON.parse(event.data);
                 console.log('onmessage: ', json);
-            
-
-                if( json.event == "_ice_candidate" ){
-                    //alert("ice_candidate");
+                
+                switch(json.event){
+                
+                case "_ice_candidate":
                     var cand= new RTCIceCandidate(json.data.candidate);
+                    //console.log('cand: ', cand);
                     pc.addIceCandidate(cand)
-                        .then(
-                        //function(val) {
-           // console.log('Then val: ', val );
-       // }
-        )
-                        .catch(function(reason) {
-            console.log('Error: Failure during addIceCandidate(): '+reason+' here.');
-        }
-        //console.log()
-        );
-
-                } 
-                else {
-
-                   if(json.event == "_offer") {
-                       //alert("offer");
-                       pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp),function(){
-                           pc.createAnswer(sendAnswerFn, function (error) {
-                                alert("error");
-                                console.log('Failure callback: ' + error);
-                            });
-                       },
-                       function(){
+                        .then()//function(val) {console.log('Then val: ', val );})
+                        .catch(function(reason) {console.log('Error: Failure during addIceCandidate(): '+reason+' here.'); });
+                    break;
+                    
+                case "_offer" : 
+                    pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp))
+                       .then(function(){
+                           pc.createAnswer().then(sendAnswerFn)
+                               .then()
+                               .catch(function (error) {
+                                    alert("error");
+                                    console.log('Failure callback: ' + error);
+                                });
+                        })
+                       .catch(function(){
                             alert("error");
-                            pc.createAnswer(sendAnswerFn, function (error) {
-                                alert("error");
-                                console.log('Failure callback: ' + error);
-                            });
+                            pc.createAnswer().then(sendAnswerFn)
+                               .then()
+                               .catch(function (error) {
+                                    alert("error");
+                                    console.log('Failure callback: ' + error);
+                                });
                         });
-
-                   }
+                    break;
+                    
+                default : 
+                    console.log("Unknown message received:");
+                    console.log(msg);
+                    
                 }
+
             };
         
 
@@ -257,84 +268,14 @@
                             });
                         });
 
+
                    }
                 }
             };
-	}
-
-    </script>
-  </head>
-
-  <body>
-    
-    <div class="main">
-  <h2>Device Orientation</h2>
-  <table>
-    <tr>
-      <td>Event Supported</td>
-      <td id="doEvent"></td>
-    </tr>
-    <tr>
-      <td>Tilt Left/Right [gamma]</td>
-      <td id="doTiltLR"></td>
-    </tr>
-    <tr>
-      <td>Tilt Front/Back [beta]</td>
-      <td id="doTiltFB"></td>
-    </tr>
-    <tr>
-      <td>Direction [alpha]</td>
-      <td id="doDirection"></td>
-    </tr>
-   </table>
-  
-</div>
-
-    <script>
-
-       // create an http object
-/*	function makeHttpObject() {
-		  try {return new XMLHttpRequest();}
-		  catch (erreur) {}
-	  	  throw new Error("La création de l’objet pour les requêtes HTTP n’a pas pu avoir lieu.");
-	}
-	
-*/	
-	
-    //we declare the js the object that will contain the motion data of the mobile
-/*	var obj = {
-	    length: 0,
-
-	    ajoutElem: function ajoutElem (elem) {
-		// obj.length est automatiquement incrémenté
-		// quand on ajoute un élément
-		[].push.call(this, elem);
-	    }
-	};
-*/
-//create the http request
-	//var requete = makeHttpObject();
-
-//On fait une connexion UDP entre le clinet et le serveur
-//create the socket
-//can't do udp with web connexion
-/*var data=[ "well","done"];
-	if(chrome.sockets){
-		//we create he first socket
-		chrome.sockets.udp.create( "udp", function callback(){console.log("chrome.socket is supported \t")});
-		//we connect the socket to the local adress
- 		chrome.socket.connect(1, "192.168.43.253", 5060, function callback(){console.log("successful connection to remote machine \t");});
-		//send the first message 
-
-		 chrome.socket.write(1,data, function callback(){console.log("sending messages from client to server")}); 
-		//}) 
-		// disconnect the client from the server
-		chrome.socket.disconnect(1);
-	}
-      
-	else {
-		console.log("chrome.socket is not supported !!!! \t");
-	}*/
+            
+            
+            
+        
 	     //we check if deviceorientation is supported by the apparatus
       if(window.DeviceOrientationEvent){
 		  console.log("DeviceOrientation is supported");
@@ -349,9 +290,9 @@
 		        // alpha is the compass direction the device is facing in degrees
               	       var dir = eventData.alpha;
 		       
-			 MobileToPc.send(tiltLR);
-			 MobileToPc.send(tiltFB);
-			 MobileToPc.send(dir);
+			 socketmotion.send(tiltLR);
+			 socketmotion.send(tiltFB);
+			 socketmotion.send(dir);
 			//we try to print the data motion
 
 			//console.log(requete.getAllResponseHeaders());
@@ -364,10 +305,18 @@
 	else {
 	  document.getElementById("doEvent").innerHTML = "Not supported."
 	}
+	}
+
+    </script>
 
 
-	
-    </script> 
+    
+    <div class="main">
+  <h2>Device Orientation</h2>
+
+  
+</div>
+
     <input type="submit" value="Adminlogin" onclick="start()">
     <!-- <input type="submit" value="send" onclick="sendData()"> -->
     <div id="messages">

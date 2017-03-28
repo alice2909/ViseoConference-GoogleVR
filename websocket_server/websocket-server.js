@@ -10,9 +10,6 @@ var credentials = {key: privateKey, cert: certificate};
 var httpsServer = https.createServer(credentials);
 
 
-
-
-
 var WebSocketServer = require('ws').Server;
 var clients = [];
 

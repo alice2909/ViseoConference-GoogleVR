@@ -1,0 +1,249 @@
+<html>
+  <head>
+    <title>server</title>
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="0">
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+    <meta http-equiv="description" content="This is my page">
+
+    <link rel="stylesheet" type="text/css" href="style1.css" />
+     <meta name="viewport" container=width=device-width>
+     
+  </head>
+  
+  <body>
+    <script type="text/javascript">
+
+
+        function onOpen(event) {
+          document.getElementById('messages').innerHTML
+            = 'Connection established';
+        }
+
+        function onError(event) {
+             document.getElementById('messages').innerHTML
+                += '<br/>'+event.data;
+        }
+
+
+        var pc;
+        
+        function start() {
+            var webSocket =new WebSocket("wss://192.168.43.253:5568");
+
+            webSocket.onopen = function(event) {
+              onOpen(event);
+            };
+
+            webSocket.onerror = function(event) {
+                  onError(event);
+            };
+
+            webSocket.onclose=function(event){
+                alert(event.data);
+            };
+            
+            
+            
+            
+            
+            webSocket.onmessage = function(event){
+            
+            //////////////////////////////////////////////////////////////////////////////////
+    var jsonstr="'"+event.data+"'";
+    var msg = JSON.parse(evt.data);
+    log("Message received: ");
+    console.dir(msg);
+
+    switch(msg.event) {
+
+      // Signaling messages: these messages are used to trade WebRTC
+      // signaling information during negotiations leading up to a video
+      // call.
+
+      case "_offer":  // Callee has answered our offer
+        handleVideoAnswerMsg(msg);
+        break;
+
+      case "_ice_candidate": // A new ICE candidate has been received
+        handleNewICECandidateMsg(msg);
+        break;
+
+      // Unknown message; output to console for debugging.
+
+      default:
+        log_error("Unknown message received:");
+        log_error(msg);
+    }
+            
+            
+            
+            //////////////////////////////////////////////////////////////////////////////////
+            
+                //alert(event.data)
+                //document.getElementById('messages').innerHTML
+                var jsonstr="'"+event.data+"'"
+                var json = JSON.parse(event.data);
+                console.log('onmessage: ', json);
+            
+
+                if( json.event == "_ice_candidate" ){
+                    //alert("ice_candidate");
+                    var cand= new RTCIceCandidate(json.data.candidate);
+                    pc.addIceCandidate(cand)
+                        .then()
+                        .catch(function(reason) {
+            console.log('Error: Failure during addIceCandidate(): '+reason+' here.');
+        		}
+        		);
+
+                } 
+                else {
+
+                   if(json.event == "_offer") {
+                       //alert("offer");
+                       pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp),function(){
+                           pc.createAnswer(sendAnswerFn, function (error) {
+                                alert("error");
+                                console.log('Failure callback: ' + error);
+                            });
+                       },
+                       function(){
+                            alert("error");
+                            pc.createAnswer(sendAnswerFn, function (error) {
+                                alert("error");
+                                console.log('Failure callback: ' + error);
+                            });
+                        });
+
+                   }
+                }
+            };
+        }
+
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            var iceServer = {
+                    "iceServers": [{
+                        "url": "stun:stun.l.google.com:19302"
+                    }]
+            };
+            pc = new webkitRTCPeerConnection(iceServer);
+
+	    
+            //pc.onaddstream = function(event){
+            pc.addstream;
+            pc.ontrack = function(event){
+                //alert(event.stream.getTracks().length);
+               var remoteMedia1 = new webkitMediaStream();
+               var remoteMedia2 = new webkitMediaStream();
+
+               event.stream.getVideoTracks()[0].enabled = true;
+               event.stream.getVideoTracks()[1].enabled = true;
+
+
+
+               remoteMedia1.addTrack(event.stream.getVideoTracks()[0]);
+               remoteMedia2.addTrack(event.stream.getVideoTracks()[1]);
+
+               document.getElementById('remoteVideo').src = URL.createObjectURL(remoteMedia1);
+               document.getElementById('remoteVideo1').src = URL.createObjectURL(remoteMedia2);
+
+
+            };
+
+
+            function send(message) {
+                waitForConnection(function () {
+                webSocket.send(message);
+                }, 1000);
+              };
+
+           function waitForConnection(callback, interval) {
+                if (webSocket.readyState === 1) {
+                  callback();
+                } else {
+                setTimeout(function () {
+                    waitForConnection(callback, interval);
+                }, interval);
+              }
+            };
+            
+            var sendOfferFn = function(desc){
+
+                alert(desc.sdp)
+
+                send(JSON.stringify({
+                    "event": "_offer",
+                    "data": {
+                        "sdp": desc
+                    }
+                }));
+            };
+
+
+
+            pc.onicecandidate = function(event){
+                if (event.candidate !== null) {
+                    webSocket.send(JSON.stringify({
+                        "event": "_ice_candidate",
+                        "data": {
+                            "candidate": event.candidate
+                        }
+                    }));
+                }
+            };
+
+
+            var sendAnswerFn = function(desc){
+                pc.setLocalDescription(desc);
+                webSocket.send(JSON.stringify({
+                    "event": "_answer",
+                    "data": {
+                        "sdp": desc
+                    }
+                }));
+            };
+
+
+          
+
+
+    </script>
+
+
+    <input type="submit" value="Adminlogin" onclick="start()">
+    <!-- <input type="submit" value="send" onclick="sendData()"> -->
+    <div id="messages">
+    </div>
+    <video id="remoteVideo" autoplay="autoplay"></video>
+    <video id="remoteVideo1" autoplay="autoplay"></video>
+    <!-- <video id="localVideo" autoplay></video> -->
+    <!-- <audio id="remoteAudio" autoplay="autoplay" controls></audio> -->
+
+  </body>
+</html>

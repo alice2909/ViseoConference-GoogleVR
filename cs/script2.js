@@ -28,20 +28,6 @@ function start() {
     }
 
 
-
-	socketmotion.onopen = function(event) {
-              onOpen(event);
-            };
-
-            socketmotion.onerror = function(event) {
-                  onError(event);
-            };
-
-            socketmotion.onclose=function(event){
-                //document.getElementById('messages').innerHTML
-                //+= '<br/>'+str(event.data);
-                alert(event.data);
-            };
     var pc = new webkitRTCPeerConnection(iceServer);
     
     function send(message) {
