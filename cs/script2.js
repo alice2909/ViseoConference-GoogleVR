@@ -166,9 +166,9 @@ function start() {
       console.log('y= ',data.y);
       console.log('z= ',data.z);
       
-      document.getElementById('tiltLR').text = data.x;
-      document.getElementById('tiltFB').text = data.y;
-      document.getElementById('dir').text = data.z;
+      document.getElementById('tiltLR').innerHTML= data.x;
+      document.getElementById('tiltFB').innerHTML = data.y;
+      document.getElementById('dir').innerHTML = data.z;
       
     }
 
