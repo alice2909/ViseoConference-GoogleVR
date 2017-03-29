@@ -8,7 +8,7 @@ function onError(event) {
         += '<br/>'+event.data;
 }
 
-var newstream = new MediaStream();
+var newstream = new webkitMediaStream();
 
 var iceServer = { "iceServers": [{"url": "stun:stun.l.google.com:19302"}] };
 
@@ -27,7 +27,7 @@ function start() {
         alert(event.data)
     }
 
-    var pc = new RTCPeerConnection(iceServer);
+    var pc = new webkitRTCPeerConnection(iceServer);
     
     function send(message) {
         waitForConnection(function () {webSocket.send(message);}, 1000);
@@ -97,10 +97,10 @@ function start() {
 
 
     function remotevideo() {
-        // if (window.stream) {
-        //   videoElement.src = null;
-        //   window.stream.stop;
-        // }
+         if (window.stream) {
+           videoElement.src = null;
+           window.stream.stop;
+         }
         var videoSource = videoSelect.value;
         var constraints = {
             video: {
@@ -109,23 +109,24 @@ function start() {
                 }]
             }
         };
-        navigator.mediaDevices.getUserMedia(constraints)
+         navigator.mediaDevices.getUserMedia(constraints)
   	    .then(successCallback3)
   	    .catch(errorCallback);
         //navigator.getUserMedia(constraints, successCallback3, errorCallback);
     }
 
     function successCallback3(stream) {
+        console.log('stream', stream.getVideoTracks()[0]);
         newstream.addTrack(stream.getVideoTracks()[0]);
         //pc.addStream(stream);
         //alert("video1");
     }
 
     function remotevideo1() {
-        // if (window.stream) {
-        //   videoElement2.src = null;
-        //   window.stream.stop;
-        // }
+         if (window.stream) {
+           videoElement2.src = null;
+           window.stream.stop;
+         }
         var videoSource = videoSelect2.value;
         var constraints = {
             video: {
@@ -143,6 +144,9 @@ function start() {
     function successCallback4(stream) {
         newstream.addTrack(stream.getVideoTracks()[0]);
         pc.addStream(newstream);
+        console.log('stream', newstream);
+        console.log('stream', newstream.getVideoTracks()[0]);
+        console.log('stream', newstream.getVideoTracks()[1]);
         pc.createOffer()
             .then(sendOfferFn)
             .catch(function (error) {
@@ -156,27 +160,42 @@ function start() {
     remotevideo();
     remotevideo1();
     //remoteaudio();
-
+    function getposition(data){
+      
+      console.log('x= ',data.x);
+      console.log('y= ',data.y);
+      console.log('z= ',data.z);
+      
+      document.getElementById('tiltLR').text = data.x;
+      document.getElementById('tiltFB').text = data.y;
+      document.getElementById('dir').text = data.z;
+      
+    }
 
     //Handle incoming signaling
-    webSocket.onMessage = function(event){
+    webSocket.onmessage = function(event){
         //alert(event.data);
         //document.getElementById('messages').innerHTML
         // += '<br/>'+event.data;
         var jsonstr="'"+event.data+"'";
         var json = JSON.parse(event.data);
         console.log('onmessage: ', json);
-        //If it is an ICE candidate, it will be added to the PeerConnection, or set the other side of the session described as a pass over the description
-        if( json.event == "_ice_candidate" ){
+        
+        switch(json.event){
+          case "_answer":
+            pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp),function(){},function(){});
+            break;
+          case "_ice_candidate": 
             pc.addIceCandidate(new RTCIceCandidate(json.data.candidate));
-        } 
-        else {
-            //Acknowledgment symbol is received
-            if(json.event == "_answer"){
-                pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp),function(){},function(){});
-                //Send ICE candidates to other clients
-            }
+            break;
+          case "_position":
+            getposition(json.data);
+            break;
+          default: 
+          
         }
+        //If it is an ICE candidate, it will be added to the PeerConnection, or set the other side of the session described as a pass over the description
+       
     };  
     
   }

@@ -10,7 +10,7 @@
 </head>
 
 <body>
-  <body>
+
     <input type="submit" value="clientLogin" onclick="start()">
 
     <div id="messages">
@@ -18,7 +18,7 @@
     <!--
     <video id="remoteVideo" autoplay></video>
    <video id="localVideo" autoplay></video> -->
-  </body>
+
 <div id="container">
   <!-- <div class="select" id="audio"> -->
   <div class="select">
@@ -34,17 +34,34 @@
   </div>
 </div>
 
+<h2>Device Orientation</h2>
+  <div id="position">
+    <table>
+    <tr>
+      <td>Tilt Left/Right [gamma]</td>
+      <td id="tiltLR"></td>
+    </tr>
+    <tr>
+      <td>Tilt Front/Back [beta]</td>
+      <td id="tiltFB"></td>
+    </tr>
+    <tr>
+      <td>Direction [alpha]</td>
+      <td id="direction"></td>
+    </tr>
+</table>
+</div>
 
-</body>
+
 
   <video id="video1"  autoplay></video>
-  <video id="video2" muted autoplay></video>
-    <audio id="audio1" muted autoplay controls ></audio>
+  <video id="video2"  autoplay></video>
+    <audio id="audio1"  autoplay controls ></audio>
 
 
   <script src="script.js"></script>
   <script src="script2.js"></script>
 
-
+</body>
 
 </html>

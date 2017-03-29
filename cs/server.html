@@ -11,7 +11,7 @@
     -->
     <!-- CSS -->
     <link rel="stylesheet" type="text/css" href="style1.css" />
-     <meta name="viewport" container=width=device-width>
+   <!--  <meta name="viewport" container=width=device-width>-->
      
   </head>
   
@@ -39,11 +39,6 @@
         
         
         function start() {
-        
-        
-            navigator.mediaDevices.enumerateDevices()
-                .then()
-                .catch(errorCallback);
                 
             var webSocket =new WebSocket("wss://192.168.43.253:5568");
 
@@ -66,9 +61,9 @@
             };
             
             
-            pc = new RTCPeerConnection(iceServer);
+            pc = new webkitRTCPeerConnection(iceServer);
            // pc = new RTCPeerConnection(iceServer);
-	    hasAddTrack = (pc.addTrack !== undefined);
+	         hasAddTrack = (pc.addTrack !== undefined);
             //pc.onaddstream = function(event){
             console.log(hasAddTrack);
             
@@ -77,11 +72,12 @@
                 alert(event.stream.getTracks().length);
                event.stream.getVideoTracks()[0].enabled = true;
                event.stream.getVideoTracks()[1].enabled = true;
-               event.stream.getVideoTracks()[0].muted = false;
-               event.stream.getVideoTracks()[1].muted = false;
+               //event.stream.getVideoTracks()[0].onunmuted = true;
+               //event.stream.getVideoTracks()[1].onunmuted = true;
+               
                 console.log('esgt',event.stream.getTracks());
-                var remoteMedia1 = new MediaStream(event.stream);
-                var remoteMedia2 = new MediaStream(event.stream);
+                var remoteMedia1 = new webkitMediaStream();//[event.stream.getVideoTracks()[0]]);
+                var remoteMedia2 = new webkitMediaStream();//[event.stream.getVideoTracks()[0]]);
               // var remoteMedia3 = new webkitMediaStream();
 
               // event.stream.getAudioTracks()[0].enabled = true;
@@ -89,8 +85,8 @@
               console.log('remoteMedia1',remoteMedia1);               
               console.log('remoteMedia2',remoteMedia2); 
               
-               //remoteMedia1.addTrack(event.stream.getVideoTracks()[0]);
-              // remoteMedia2.addTrack(event.stream.getVideoTracks()[1]);
+               remoteMedia1.addTrack(event.stream.getVideoTracks()[0]);
+               remoteMedia2.addTrack(event.stream.getVideoTracks()[1]);
                
                
               // remoteMedia3.addTrack(event.stream.getAudioTracks()[0]);
@@ -131,8 +127,8 @@
             var sendOfferFn = function(desc){
 
                 alert(desc.sdp)
-                //pc.setRemoteDescription(desc);
-               // pc.setLocalDescription(desc);
+                pc.setRemoteDescription(desc);
+                pc.setLocalDescription(desc);
 
                 send(JSON.stringify({
                     "event": "_offer",
@@ -235,17 +231,42 @@
                 }
 
             }
-            
-            
-            function position(){
-                var x;
-                var y;
-                var z;
-                
-            
-            
-            
-            }
+      
+      //we check if deviceorientation is supported by the apparatus
+      if(window.DeviceOrientationEvent){
+		  console.log("DeviceOrientation is supported");
+		  
+		  
+		  // Listen for the deviceorientation event and handle the raw data
+		  window.addEventListener('deviceorientation', function(eventData) {
+		        // gamma is the left-to-right tilt in degrees, where right is positive
+		       var tiltLR = eventData.gamma;
+		        // beta is the front-to-back tilt in degrees, where front is positive
+		       var tiltFB = eventData.beta;
+		        // alpha is the compass direction the device is facing in degrees
+           var dir = eventData.alpha;
+           
+           console.log('avant send');
+	         send(JSON.stringify({
+                "event": "_position",
+                "data": {
+                    "x": tiltLR,
+                    "y": tiltFB,
+                    "z": dir
+                }
+            }));
+			//we try to print the data motion
+
+			//console.log(requete.getAllResponseHeaders());
+
+		       //deviceOrientationHandler(tiltLR, tiltFB, dir);
+
+	  	  }, false);
+	 } 
+
+	else {
+	}
+
             
             
 }
@@ -278,52 +299,8 @@
 
 //On fait une connexion UDP entre le clinet et le serveur
 //create the socket
-var data=[ "well","done"];
-	if(chrome.sockets){
-		//we create he first socket
-		chrome.sockets.udp.create( "udp", function callback(){console.log("chrome.socket is supported \t")});
-		//we connect the socket to the local adress
- 		chrome.socket.connect(1, "192.168.43.253", 5060, function callback(){console.log("successful connection to remote machine \t");});
-		//send the first message 
-
-		 chrome.socket.write(1,data, function callback(){console.log("sending messages from client to server")}); 
-
-		//}) 
-		// disconnect the client from the server
-		chrome.socket.disconnect(1);
-	}
-      
-	else {
-		console.log("chrome.socket is not supported !!!! \t");
-	}
-	     //we check if deviceorientation is supported by the apparatus
-      if(window.DeviceOrientationEvent){
-		  console.log("DeviceOrientation is supported");
-		  // Listen for the deviceorientation event and handle the raw data
-		  window.addEventListener('deviceorientation', function(eventData) {
-		        // gamma is the left-to-right tilt in degrees, where right is positive
-		       var tiltLR = eventData.gamma;
-				
-		        // beta is the front-to-back tilt in degrees, where front is positive
-		       var tiltFB = eventData.beta;
- 
-		        // alpha is the compass direction the device is facing in degrees
-              	       var dir = eventData.alpha;
 
 	
-			//we try to print the data motion
-
-			//console.log(requete.getAllResponseHeaders());
-
-		       //deviceOrientationHandler(tiltLR, tiltFB, dir);
-
-	  	  }, false);
-	 } 
-
-	else {
-	  document.getElementById("doEvent").innerHTML = "Not supported."
-	}
-
 
 	
     </script> 

@@ -7,9 +7,9 @@
   var videoSelect = document.querySelector('select#videoSource');
   var videoSelect2 = document.querySelector('select#videoSource2');
 
- /* navigator.getUserMedia =  navigator.getUserMedia
+  navigator.mediaDevices.getUserMedia =  navigator.mediaDevices.getUserMedia
   						||navigator.webkitGetUserMedia
-  						||navigator.mozGetUserMedia;*/
+  						||navigator.mozGetUserMedia;
   						
   navigator.mediaDevices.enumerateDevices()
   .then(gotDevices)

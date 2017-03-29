@@ -40,7 +40,7 @@ wsServer.on('connection', function(ws) {
     // all messages from users here.
     ws.on('message', function(message) {
     	console.log(message);
-        //if (message.type === 'utf8') {
+        if (message.type === 'utf8') {
             // process WebSocket message
             console.log((new Date()) + ' Received Message ' + message);
             // broadcast message to all connected clients
@@ -49,7 +49,7 @@ wsServer.on('connection', function(ws) {
                   outputConnection.send(message, sendCallback);
                 }
             });
-        //}
+        }
     });
 
     ws.on('close', function(connection) {
