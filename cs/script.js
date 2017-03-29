@@ -129,6 +129,7 @@ FONCTIONS DEPRECIEES
   	    window.stream.stop;
   	  }
   	  var videoSource = videoSelect.value;
+  	  console.log('vidsource: ', videoSource);
   	  var constraints = {
   	    video: {
   	      optional: [{

@@ -8,7 +8,7 @@ function onError(event) {
         += '<br/>'+event.data;
 }
 
-var newstream = new webkitMediaStream();
+var newstream = new MediaStream();
 
 var iceServer = { "iceServers": [{"url": "stun:stun.l.google.com:19302"}] };
 
@@ -143,9 +143,11 @@ function start() {
     function successCallback4(stream) {
         newstream.addTrack(stream.getVideoTracks()[0]);
         pc.addStream(newstream);
-        pc.createOffer(sendOfferFn, function (error) {
-            console.log('Failure callback: ' + error);
-        });
+        pc.createOffer()
+            .then(sendOfferFn)
+            .catch(function (error) {
+                console.log('Failure callback: ' + error);
+            });
         //alert("video2");
         //var k = newstream.getTracks().length;
         //alert(newstream.getTracks().length);

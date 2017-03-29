@@ -17,7 +17,8 @@
   
   <body>
     <script type="text/javascript">
-
+        var remoteVideo = document.querySelector('#remoteVideo');
+        var remoteVideo1 = document.querySelector('#remoteVideo1');
 
         function onOpen(event) {
           document.getElementById('messages').innerHTML
@@ -31,8 +32,19 @@
 
 
         var pc;
-        var sendChannel;
+        
+        function errorCallback(error) {
+           console.log('navigator.mediaDevices error: ', error);
+        }
+        
+        
         function start() {
+        
+        
+            navigator.mediaDevices.enumerateDevices()
+                .then()
+                .catch(errorCallback);
+                
             var webSocket =new WebSocket("wss://192.168.43.253:5568");
 
             webSocket.onopen = function(event) {
@@ -54,30 +66,49 @@
             };
             
             
-            //pc = new webkitRTCPeerConnection(iceServer);
             pc = new RTCPeerConnection(iceServer);
-	    
+           // pc = new RTCPeerConnection(iceServer);
+	    hasAddTrack = (pc.addTrack !== undefined);
             //pc.onaddstream = function(event){
-            pc.addstream;
-            pc.ontrack = function(event){
-                //alert(event.stream.getTracks().length);
-               var remoteMedia1 = new MediaStream();
-               var remoteMedia2 = new MediaStream();
-              // var remoteMedia3 = new webkitMediaStream();
+            console.log(hasAddTrack);
+            
+            pc.onaddstream = function(event){
+            
+                alert(event.stream.getTracks().length);
                event.stream.getVideoTracks()[0].enabled = true;
                event.stream.getVideoTracks()[1].enabled = true;
+               event.stream.getVideoTracks()[0].muted = false;
+               event.stream.getVideoTracks()[1].muted = false;
+                console.log('esgt',event.stream.getTracks());
+                var remoteMedia1 = new MediaStream(event.stream);
+                var remoteMedia2 = new MediaStream(event.stream);
+              // var remoteMedia3 = new webkitMediaStream();
+
               // event.stream.getAudioTracks()[0].enabled = true;
-
-
-               remoteMedia1.addTrack(event.stream.getVideoTracks()[0]);
-               remoteMedia2.addTrack(event.stream.getVideoTracks()[1]);
+    
+              console.log('remoteMedia1',remoteMedia1);               
+              console.log('remoteMedia2',remoteMedia2); 
+              
+               //remoteMedia1.addTrack(event.stream.getVideoTracks()[0]);
+              // remoteMedia2.addTrack(event.stream.getVideoTracks()[1]);
+               
+               
               // remoteMedia3.addTrack(event.stream.getAudioTracks()[0]);
-               document.getElementById('remoteVideo').src = URL.createObjectURL(remoteMedia1);
-               document.getElementById('remoteVideo1').src = URL.createObjectURL(remoteMedia2);
+             // console.log('eventvideotrack0',event.stream.getVideoTracks()[0]);
+            //  console.log('eventvideotrack1',event.stream.getVideoTracks()[1]); 
+              //console.log('remoteMedia1',remoteMedia1.getTrack());               
+              //console.log('remoteMedia2',remoteMedia2);               
+                           
+               document.getElementById('remoteVideo').src = window.URL.createObjectURL(remoteMedia1);
+               document.getElementById('remoteVideo1').src = window.URL.createObjectURL(remoteMedia2);
               // document.getElementById('remoteAudio').src = URL.createObjectURL(remoteMedia3);
                 // var sound = new Audio(event.stream.getAudioTracks()[0]);
                 // sound.play();
 
+             //  document.getElementById("remoteVideo").srcObject = event.stream.getVideoTracks()[0];
+             //  document.getElementById("remoteVideo1").srcObject = event.stream.getVideoTracks()[1];
+            // remoteVideo.src = window.URL.createObjectURL(event.stream.getTracks()[0]);
+           //  remoteVideo1.src = window.URL.createObjectURL(event.stream.getTracks()[1]);
             };
 
 
@@ -161,15 +192,33 @@
                 case "_offer" : 
                     pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp))
                        .then(function(){
+                           /*//console.log('sream getvideo',stream);
+                           var constraints = {
+                               video: {
+                                   optional: [{
+                                       sourceId: videoSource
+                                   }]
+                               }
+                           };
+                           
+                           navigator.mediaDevices.getUserMedia(constraints)
+                              .then(function(stream) {
+                              console.log('stream', stream);
+                                  pc.addStream(stream);
+                              })
+                              .catch(errorCallback);
+                              
+                           pc.addStream(stream);
+                           */
                            pc.createAnswer().then(sendAnswerFn)
                                .then()
                                .catch(function (error) {
-                                    alert("error");
+                                    alert("error1");
                                     console.log('Failure callback: ' + error);
                                 });
-                        })
+                       })
                        .catch(function(){
-                            alert("error");
+                            alert("error2");
                             pc.createAnswer().then(sendAnswerFn)
                                .then()
                                .catch(function (error) {
@@ -186,37 +235,23 @@
                 }
 
             }
+            
+            
+            function position(){
+                var x;
+                var y;
+                var z;
+                
+            
+            
+            
+            }
+            
+            
 }
 
 
-    </script>
 
-
-    
-    <div class="main">
-  <h2>Device Orientation</h2>
-  <table>
-    <tr>
-      <td>Event Supported</td>
-      <td id="doEvent"></td>
-    </tr>
-    <tr>
-      <td>Tilt Left/Right [gamma]</td>
-      <td id="doTiltLR"></td>
-    </tr>
-    <tr>
-      <td>Tilt Front/Back [beta]</td>
-      <td id="doTiltFB"></td>
-    </tr>
-    <tr>
-      <td>Direction [alpha]</td>
-      <td id="doDirection"></td>
-    </tr>
-   </table>
-  
-</div>
-
-    <script>
 
        // create an http object
 /*	function makeHttpObject() {
@@ -296,8 +331,8 @@ var data=[ "well","done"];
     <!-- <input type="submit" value="send" onclick="sendData()"> -->
     <div id="messages">
     </div>
-    <video id="remoteVideo" autoplay="autoplay"></video>
-    <video id="remoteVideo1" autoplay="autoplay"></video>
+    <video id="remoteVideo" autoplay></video>
+    <video id="remoteVideo1" autoplay></video>
     <!-- <video id="localVideo" autoplay></video> -->
     <!-- <audio id="remoteAudio" autoplay="autoplay" controls></audio> -->
 
