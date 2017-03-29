@@ -1,317 +1,59 @@
 <html>
-  <head>
-    <title>server</title>
-    <meta http-equiv="pragma" content="no-cache">
-    <meta http-equiv="cache-control" content="no-cache">
-    <meta http-equiv="expires" content="0">
-    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
-    <meta http-equiv="description" content="This is my page">
-    <!--
-    <link rel="stylesheet" type="text/css" href="styles.css">
-    -->
-    <!-- CSS -->
-    <link rel="stylesheet" type="text/css" href="style1.css" />
-   <!--  <meta name="viewport" container=width=device-width>-->
-     
-  </head>
-  
-  <body>
-    <script type="text/javascript">
-        var remoteVideo = document.querySelector('#remoteVideo');
-        var remoteVideo1 = document.querySelector('#remoteVideo1');
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<title>RI</title>
 
-        function onOpen(event) {
-          document.getElementById('messages').innerHTML
-            = 'Connection established';
-        }
-
-        function onError(event) {
-             document.getElementById('messages').innerHTML
-                += '<br/>'+event.data;
-        }
+<!-- CSS -->
+<link rel="stylesheet" type="text/css" href="style.css" />
 
 
-        var pc;
-        
-        function errorCallback(error) {
-           console.log('navigator.mediaDevices error: ', error);
-        }
-        
-        
-        function start() {
-                
-            var webSocket =new WebSocket("wss://192.168.43.253:5568");
+</head>
 
-            webSocket.onopen = function(event) {
-              onOpen(event);
-            };
+<body>
 
-            webSocket.onerror = function(event) {
-                  onError(event);
-            };
+  <input type="submit" value="serverLogin" onclick="start()">
+  <div id="messages"></div>
 
-            webSocket.onclose=function(event){
-                alert(event.data);
-            };
-            
-            var iceServer = {
-                    "iceServers": [{
-                        "url": "stun:stun.l.google.com:19302"
-                    }]
-            };
-            
-            
-            pc = new webkitRTCPeerConnection(iceServer);
-           // pc = new RTCPeerConnection(iceServer);
-	         hasAddTrack = (pc.addTrack !== undefined);
-            //pc.onaddstream = function(event){
-            console.log(hasAddTrack);
-            
-            pc.onaddstream = function(event){
-            
-                alert(event.stream.getTracks().length);
-               event.stream.getVideoTracks()[0].enabled = true;
-               event.stream.getVideoTracks()[1].enabled = true;
-               //event.stream.getVideoTracks()[0].onunmuted = true;
-               //event.stream.getVideoTracks()[1].onunmuted = true;
-               
-                console.log('esgt',event.stream.getTracks());
-                var remoteMedia1 = new webkitMediaStream();//[event.stream.getVideoTracks()[0]]);
-                var remoteMedia2 = new webkitMediaStream();//[event.stream.getVideoTracks()[0]]);
-              // var remoteMedia3 = new webkitMediaStream();
-
-              // event.stream.getAudioTracks()[0].enabled = true;
-    
-              console.log('remoteMedia1',remoteMedia1);               
-              console.log('remoteMedia2',remoteMedia2); 
-              
-               remoteMedia1.addTrack(event.stream.getVideoTracks()[0]);
-               remoteMedia2.addTrack(event.stream.getVideoTracks()[1]);
-               
-               
-              // remoteMedia3.addTrack(event.stream.getAudioTracks()[0]);
-             // console.log('eventvideotrack0',event.stream.getVideoTracks()[0]);
-            //  console.log('eventvideotrack1',event.stream.getVideoTracks()[1]); 
-              //console.log('remoteMedia1',remoteMedia1.getTrack());               
-              //console.log('remoteMedia2',remoteMedia2);               
-                           
-               document.getElementById('remoteVideo').src = window.URL.createObjectURL(remoteMedia1);
-               document.getElementById('remoteVideo1').src = window.URL.createObjectURL(remoteMedia2);
-              // document.getElementById('remoteAudio').src = URL.createObjectURL(remoteMedia3);
-                // var sound = new Audio(event.stream.getAudioTracks()[0]);
-                // sound.play();
-
-             //  document.getElementById("remoteVideo").srcObject = event.stream.getVideoTracks()[0];
-             //  document.getElementById("remoteVideo1").srcObject = event.stream.getVideoTracks()[1];
-            // remoteVideo.src = window.URL.createObjectURL(event.stream.getTracks()[0]);
-           //  remoteVideo1.src = window.URL.createObjectURL(event.stream.getTracks()[1]);
-            };
-
-
-            function send(message) {
-                waitForConnection(function () {
-                webSocket.send(message);
-                }, 1000);
-            };
-
-           function waitForConnection(callback, interval) {
-                if (webSocket.readyState === 1) {
-                  callback();
-                } else {
-                setTimeout(function () {
-                    waitForConnection(callback, interval);
-                }, interval);
-              }
-            };
-            
-            var sendOfferFn = function(desc){
-
-                alert(desc.sdp)
-                pc.setRemoteDescription(desc);
-                pc.setLocalDescription(desc);
-
-                send(JSON.stringify({
-                    "event": "_offer",
-                    "data": {
-                        "sdp": desc
-                    }
-                }));
-            };
-
-
-
-            pc.onicecandidate = function(event){
-                if (event.candidate !== null) {
-                    webSocket.send(JSON.stringify({
-                        "event": "_ice_candidate",
-                        "data": {
-                            "candidate": event.candidate
-                        }
-                    }));
-                }
-            };
-
-
-            var sendAnswerFn = function(desc){
-                //desc.sdp = setSDPStereo(desc.sdp);
-                pc.setLocalDescription(desc);
-                webSocket.send(JSON.stringify({
-                    "event": "_answer",
-                    "data": {
-                        "sdp": desc
-                    }
-                }));
-            };
-
-
-          
-            webSocket.onmessage = function(event){
-            
-                //alert(event.data)
-                //document.getElementById('messages').innerHTML
-                //+= '<br/>'+event.data;
-                
-                var jsonstr="'"+event.data+"'"
-                var json = JSON.parse(event.data);
-                console.log('onmessage: ', json);
-                
-                switch(json.event){
-                
-                case "_ice_candidate":
-                    var cand= new RTCIceCandidate(json.data.candidate);
-                    //console.log('cand: ', cand);
-                    pc.addIceCandidate(cand)
-                        .then()//function(val) {console.log('Then val: ', val );})
-                        .catch(function(reason) {console.log('Error: Failure during addIceCandidate(): '+reason+' here.'); });
-                    break;
-                    
-                case "_offer" : 
-                    pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp))
-                       .then(function(){
-                           /*//console.log('sream getvideo',stream);
-                           var constraints = {
-                               video: {
-                                   optional: [{
-                                       sourceId: videoSource
-                                   }]
-                               }
-                           };
-                           
-                           navigator.mediaDevices.getUserMedia(constraints)
-                              .then(function(stream) {
-                              console.log('stream', stream);
-                                  pc.addStream(stream);
-                              })
-                              .catch(errorCallback);
-                              
-                           pc.addStream(stream);
-                           */
-                           pc.createAnswer().then(sendAnswerFn)
-                               .then()
-                               .catch(function (error) {
-                                    alert("error1");
-                                    console.log('Failure callback: ' + error);
-                                });
-                       })
-                       .catch(function(){
-                            alert("error2");
-                            pc.createAnswer().then(sendAnswerFn)
-                               .then()
-                               .catch(function (error) {
-                                    alert("error");
-                                    console.log('Failure callback: ' + error);
-                                });
-                        });
-                    break;
-                    
-                default : 
-                    console.log("Unknown message received:");
-                    console.log(msg);
-                    
-                }
-
-            }
-      
-      //we check if deviceorientation is supported by the apparatus
-      if(window.DeviceOrientationEvent){
-		  console.log("DeviceOrientation is supported");
-		  
-		  
-		  // Listen for the deviceorientation event and handle the raw data
-		  window.addEventListener('deviceorientation', function(eventData) {
-		        // gamma is the left-to-right tilt in degrees, where right is positive
-		       var tiltLR = eventData.gamma;
-		        // beta is the front-to-back tilt in degrees, where front is positive
-		       var tiltFB = eventData.beta;
-		        // alpha is the compass direction the device is facing in degrees
-           var dir = eventData.alpha;
-           
-           console.log('avant send');
-	         send(JSON.stringify({
-                "event": "_position",
-                "data": {
-                    "x": tiltLR,
-                    "y": tiltFB,
-                    "z": dir
-                }
-            }));
-			//we try to print the data motion
-
-			//console.log(requete.getAllResponseHeaders());
-
-		       //deviceOrientationHandler(tiltLR, tiltFB, dir);
-
-	  	  }, false);
-	 } 
-
-	else {
-	}
-
-            
-            
-}
-
-
-
-
-       // create an http object
-/*	function makeHttpObject() {
-		  try {return new XMLHttpRequest();}
-		  catch (erreur) {}
-	  	  throw new Error("La création de l’objet pour les requêtes HTTP n’a pas pu avoir lieu.");
-	}
-	
-*/	
-	
-    //we declare the js the object that will contain the motion data of the mobile
-/*	var obj = {
-	    length: 0,
-
-	    ajoutElem: function ajoutElem (elem) {
-		// obj.length est automatiquement incrémenté
-		// quand on ajoute un élément
-		[].push.call(this, elem);
-	    }
-	};
-*/
-//create the http request
-	//var requete = makeHttpObject();
-
-//On fait une connexion UDP entre le clinet et le serveur
-//create the socket
-
-	
-
-	
-    </script> 
-    <input type="submit" value="Adminlogin" onclick="start()">
-    <!-- <input type="submit" value="send" onclick="sendData()"> -->
-    <div id="messages">
+  <div id="container">
+    <!-- <div class="select" id="audio"> -->
+    <div class="select">
+      <label for="audioSource">Audio source: </label>
+      <select id="audioSource"></select>
     </div>
-    <video id="remoteVideo" autoplay></video>
-    <video id="remoteVideo1" autoplay></video>
-    <!-- <video id="localVideo" autoplay></video> -->
-    <!-- <audio id="remoteAudio" autoplay="autoplay" controls></audio> -->
 
-  </body>
+    <div class="select">
+      <label for="videoSource">Camera 1: </label>
+      <select id="videoSource"></select>
+      <label for="videoSource2">Camera 2: </label>
+      <select id="videoSource2"></select>
+    </div>
+  </div>
+
+  <h2>Device Orientation</h2>
+  <div id="position">
+    <table>
+      <tr>
+        <td>Tilt Left/Right [gamma]</td>
+        <td id="tiltLR" text=""></td>
+      </tr>
+      <tr>
+        <td>Tilt Front/Back [beta]</td>
+        <td id="tiltFB" text=""></td>
+      </tr>
+      <tr>
+        <td>Direction [alpha]</td>
+        <td id="dir" text=""></td>
+      </tr>
+    </table>
+  </div>
+
+  <video id="video1"  autoplay></video>
+  <video id="video2"  autoplay></video>
+  <audio id="audio1"  autoplay controls ></audio>
+
+  <script src="scriptServer1.js"></script>
+  <script src="scriptServer2.js"></script>
+
+</body>
+
 </html>

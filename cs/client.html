@@ -1,67 +1,26 @@
 <html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-<title>RI</title>
-
-<!-- CSS -->
-<link rel="stylesheet" type="text/css" href="style.css" />
-
-
-</head>
-
-<body>
-
-    <input type="submit" value="clientLogin" onclick="start()">
-
-    <div id="messages">
-    </div>
+  <head>
+    <title>Client</title>
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="0">
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+    <meta http-equiv="description" content="This is my page">
     <!--
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    -->
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="style1.css" />
+   <!--  <meta name="viewport" container=width=device-width>-->
+     
+  </head>
+  
+  <body>
+    <script src="scriptClient.js"></script>
+    <input type="submit" value="Adminlogin" onclick="start()">
+    <div id="messages"></div>
     <video id="remoteVideo" autoplay></video>
-   <video id="localVideo" autoplay></video> -->
+    <video id="remoteVideo1" autoplay></video>
 
-<div id="container">
-  <!-- <div class="select" id="audio"> -->
-  <div class="select">
-    <label for="audioSource">Audio source: </label>
-    <select id="audioSource"></select>
-  </div>
-
-  <div class="select">
-    <label for="videoSource">Camera 1: </label>
-    <select id="videoSource"></select>
-    <label for="videoSource2">Camera 2: </label>
-    <select id="videoSource2"></select>
-  </div>
-</div>
-
-<h2>Device Orientation</h2>
-  <div id="position">
-    <table>
-    <tr>
-      <td>Tilt Left/Right [gamma]</td>
-      <td id="tiltLR" text=""></td>
-    </tr>
-    <tr>
-      <td>Tilt Front/Back [beta]</td>
-      <td id="tiltFB" text=""></td>
-    </tr>
-    <tr>
-      <td>Direction [alpha]</td>
-      <td id="dir" text=""></td>
-    </tr>
-</table>
-</div>
-
-
-
-  <video id="video1"  autoplay></video>
-  <video id="video2"  autoplay></video>
-    <audio id="audio1"  autoplay controls ></audio>
-
-
-  <script src="script.js"></script>
-  <script src="script2.js"></script>
-
-</body>
-
+  </body>
 </html>
