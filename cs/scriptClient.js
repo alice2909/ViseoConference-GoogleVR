@@ -83,9 +83,8 @@ function start() {
   };
   
   var sendOfferFn = function(desc){
-  
-    alert(desc.sdp)
-    pc.setRemoteDescription(desc);
+    //alert(desc.sdp)
+    //pc.setRemoteDescription(desc);
     pc.setLocalDescription(desc);
     
     send(JSON.stringify({
@@ -111,7 +110,6 @@ function start() {
   
   
   var sendAnswerFn = function(desc){
-  
     pc.setLocalDescription(desc);
     webSocket.send(JSON.stringify({
       "event": "_answer",
@@ -124,11 +122,6 @@ function start() {
   
   
   webSocket.onmessage = function(event){
-    
-    //alert(event.data)
-    //document.getElementById('messages').innerHTML
-    //+= '<br/>'+event.data;
-    
     var jsonstr="'"+event.data+"'"
     var json = JSON.parse(event.data);
     console.log('onmessage: ', json);
@@ -136,10 +129,8 @@ function start() {
     switch(json.event){
       
       case "_ice_candidate":
-        var cand= new RTCIceCandidate(json.data.candidate);
-        //console.log('cand: ', cand);
-        pc.addIceCandidate(cand)
-          .then()//function(val) {console.log('Then val: ', val );})
+        pc.addIceCandidate(new RTCIceCandidate(json.data.candidate))
+          .then()
           .catch(function(reason) {console.log('Error: Failure during addIceCandidate(): '+reason+' here.'); });
         break;
       
@@ -154,7 +145,6 @@ function start() {
               });
           })
           .catch(function(){
-            alert("error2");
             pc.createAnswer().then(sendAnswerFn)
               .then()
               .catch(function (error) {

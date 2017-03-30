@@ -97,10 +97,10 @@ function start() {
   
   
   function remotevideo() {
-       if (window.stream) {
+     /*  if (window.stream) {
          videoElement.src = null;
          window.stream.stop;
-       }
+       }*/
       var videoSource = videoSelect.value;
       var constraints = {
           video: {
@@ -112,7 +112,6 @@ function start() {
        navigator.mediaDevices.getUserMedia(constraints)
       .then(successCallback3)
       .catch(errorCallback);
-      //navigator.getUserMedia(constraints, successCallback3, errorCallback);
   }
   
   function successCallback3(stream) {
@@ -123,10 +122,10 @@ function start() {
   }
   
   function remotevideo1() {
-       if (window.stream) {
+      /* if (window.stream) {
          videoElement2.src = null;
          window.stream.stop;
-       }
+       }*/
       var videoSource = videoSelect2.value;
       var constraints = {
           video: {
@@ -138,7 +137,6 @@ function start() {
       navigator.mediaDevices.getUserMedia(constraints)
           .then(successCallback4)
           .catch(errorCallback);
-      //navigator.getUserMedia(constraints, successCallback4, errorCallback);
   }
   
   function successCallback4(stream) {
@@ -159,15 +157,9 @@ function start() {
   //remoteaudio();
   
   function getposition(data){
-    
-    //console.log('x= ',data.x);
-    //console.log('y= ',data.y);
-    //console.log('z= ',data.z);
-    
     document.getElementById('tiltLR').innerHTML= data.x;
     document.getElementById('tiltFB').innerHTML = data.y;
     document.getElementById('dir').innerHTML = data.z;
-    
   }
   
   //Handle incoming signaling
@@ -180,6 +172,25 @@ function start() {
       console.log('onmessage: ', json);
       
       switch(json.event){
+        case "_offer" : 
+          pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp))
+            .then(function(){
+              pc.createAnswer().then(sendAnswerFn)
+                .then()
+                .catch(function (error) {
+                  alert("error1");
+                  console.log('Failure callback: ' + error);
+                });
+            })
+            .catch(function(){
+              pc.createAnswer().then(sendAnswerFn)
+                .then()
+                .catch(function (error) {
+                  alert("error");
+                  console.log('Failure callback: ' + error);
+                });
+            });
+          break;
         case "_answer":
           pc.setRemoteDescription(new RTCSessionDescription(json.data.sdp),function(){},function(){});
           break;
