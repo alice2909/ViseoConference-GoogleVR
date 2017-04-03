@@ -41,14 +41,16 @@ Cylon.robot({
 //  name: 'rosie',
 
   connections: {
-    arduino: { adaptor: 'firmata', port: '/dev/tty.usbmodem1421' }
+    arduino: { adaptor: 'firmata', port: '/dev/ttyACM0' }
   },
 
   devices: {
-    led: { driver: 'led', pin: 13 }
+    led: { driver: 'led', pin: 13 },
+    servo1: { driver: "servo", pin: 3, range: { min: 30, max: 150 } }, 
+    servo2: { driver: "servo", pin: 5, range: { min: 30, max: 150 } }
   },
 
-  work: function() {
+  work: function(my) {
     // for this example with sockets
     // we are going to be interacting
     // with the robot using the code in
@@ -61,6 +63,15 @@ Cylon.robot({
           var jsonstr = JSON.stringify(message);
           console.log('Le serveur a un message pour vous : ' + jsonstr);
         })
+    });
+    my.led.turnOn();
+    my.servo1.angle(50);
+    my.servo2.angle(50);
+    console.log("Current Angle: " + (my.servo1.currentAngle()));
+    console.log("Current Angle: " + (my.servo2.currentAngle()));
+    every((1).seconds(), function() {
+      my.servo1.angle(my.servo1.currentAngle()+20);
+      my.servo2.angle(my.servo2.currentAngle()+20);
     });
   }
 });

@@ -1,5 +1,36 @@
-
+/*"use strict";
+  var fb;
+  var lr;
+  
+  var Cylon = require("Cylonjs");
+  
+  
+  Cylon.robot({
+    
+    connections: {
+      arduino: { adaptor: "firmata", port: "/dev/ttyACM0" }
+    },
+  
+    devices: {
+      led: { driver: "led", pin: 17 },
+      servo: { driver: "servo1", pin: 3, range: { min: 30, max: 150 } }, 
+      servo: { driver: "servo2", pin: 5, range: { min: 30, max: 150 } }
+    },
+  
+    work: function(my) {
+      my.led.turnOn();
+      console.log("Current Angle: " + (my.servo1.currentAngle()));
+      console.log("Current Angle: " + (my.servo2.currentAngle()));
+      every((1).seconds(), function() {
+        my.servo1.angle(fb);
+        my.servo2.angle(lr);
+      });
+    }
+  }).start();*/
+  
+  
 function start() {
+
   
   function onOpen(event) {
       document.getElementById('messages').innerHTML = 'Connection established';
@@ -155,11 +186,15 @@ function start() {
   remotevideo();
   remotevideo1();
   //remoteaudio();
-  
+
+
   function getposition(data){
+    fb=data.y;
+    lr=data.x;
     document.getElementById('tiltLR').innerHTML= data.x;
     document.getElementById('tiltFB').innerHTML = data.y;
     document.getElementById('dir').innerHTML = data.z;
+    
   }
   
   //Handle incoming signaling
